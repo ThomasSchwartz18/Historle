@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historle - Guess the moment. One clue at a time.</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/leaderboard-entries.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-container">
+                <div class="header-content">
+                    <div class="header-title">
+                        <img src="{{ url_for('static', filename='images/logo-bg-removed.png') }}" alt="Historle Logo" class="header-logo">
+                        <h1>Historle</h1>
+                    </div>
+                    <p class="tagline">Guess the moment. One clue at a time.</p>
+                </div>
+            </div>
+        </header>        
+
+        <main>
+            <div class="game-section">
+                <div class="game-container">
+                    <div class="year-display" aria-label="Event Year">
+                        Year: <span id="event-year">????</span>
+                    </div>
+
+                    <div class="clues-container">
+                        <div class="clue current-clue" id="current-clue" aria-live="polite">
+                            Loading clue...
+                        </div>
+                        <div class="previous-clues" id="previous-clues"></div>
+                    </div>
+
+                    <form id="guess-form" class="guess-form">
+                        <div class="input-group">
+                            <input type="text" 
+                                   id="guess-input" 
+                                   placeholder="Enter your guess..." 
+                                   aria-label="Enter your guess"
+                                   autocomplete="off"
+                                   required>
+                            <button type="submit" aria-label="Submit guess">Submit</button>
+                        </div>
+                        <div class="clues-remaining">
+                            Remaining guesses: <span id="guesses-left">4</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="leaderboard" class="leaderboard">
+                <h2>Leaderboard</h2>
+                <div class="leaderboard-header">
+                    <span class="rank">Rank</span>
+                    <span class="name">Name</span>
+                    <span class="time">Time</span>
+                    <span class="clues">Clues</span>
+                </div>
+                <div id="leaderboard-entries" class="leaderboard-entries">
+                    <!-- Leaderboard entries will be inserted here -->
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>A daily historical event guessing game</p>
+        </footer>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modal-close" aria-label="Close">×</button>
+            <div class="result-container">
+                <h2 id="result-header"></h2>
+                <p id="correct-answer"></p>
+                <div class="summary" id="event-summary"></div>
+                
+                <div class="name-entry hidden" id="name-entry">
+                    <p>Congratulations! Enter your name for the leaderboard:</p>
+                    <div class="input-group">
+                        <input type="text" 
+                               id="player-name" 
+                               placeholder="Your name" 
+                               maxlength="20"
+                               aria-label="Enter your name">
+                        <button id="submit-score" aria-label="Submit score">Submit Score</button>
+                    </div>
+                </div>
+                
+                <button id="share-button" class="share-button">
+                    Share Result
+                </button>
+                <p class="return-tomorrow">Come back tomorrow for a new historical moment!</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+</body>
+</html> 

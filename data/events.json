@@ -1,0 +1,45 @@
+[
+  {
+    "date": "2025-03-28",
+    "answer": "The Fall of the Berlin Wall",
+    "alt_answers": [
+      "The Berlin Wall",
+      "Berlin Wall",
+      "Berlin Wall falls",
+      "Fall of the Berlin Wall",
+      "Berlin wall collapse",
+      "Collapse of the Berlin Wall"
+    ],
+    "year": 1989,
+    "clues": [
+      "When walls crumble, so do empires.",
+      "A pivotal Cold War moment in Europe.",
+      "It happened in 1989, between East and West.",
+      "United a divided city.",
+      "A symbol of both division and hope for a reunited future."
+    ],
+    "summary": "On November 9, 1989, the Berlin Wall fell, marking the symbolic end of the Cold War and the beginning of Germany's reunification."
+  },
+  {
+    "date": "2025-03-29",
+    "answer": "The Moon Landing",
+    "alt_answers": [
+      "Moon Landing",
+      "Apollo 11",
+      "Neil Armstrong on the Moon",
+      "Landing on the Moon",
+      "First Moon Landing",
+      "Man on the Moon"
+    ],
+    "year": 1969,
+    "clues": [
+      "A giant leap for imagination.",
+      "A space race victory broadcast to the world.",
+      "It happened in 1969, watched by millions.",
+      "Neil Armstrong took a step no one had before.",
+      "Apollo 11's mission showcased human ingenuity."
+    ],
+    "summary": "On July 20, 1969, Apollo 11 successfully landed on the Moon. Neil Armstrong became the first human to walk on the lunar surface, famously declaring it 'one small step for man, one giant leap for mankind.'"
+  }
+]
+

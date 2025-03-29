@@ -1,0 +1,4 @@
+Flask
+thefuzz
+python-Levenshtein
+python-dateutil
