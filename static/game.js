@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         eventSummary: document.getElementById('event-summary'),
         shareButton: document.getElementById('share-button'),
         eventYear: document.getElementById('event-year'),
+        eventDifficulty: document.getElementById('event-difficulty'),
         nameEntry: document.getElementById('name-entry'),
         playerName: document.getElementById('player-name'),
         submitScore: document.getElementById('submit-score'),
@@ -38,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
             elements.currentClue.textContent = data.clue;
             elements.eventYear.textContent = data.year;
             elements.guessesLeft.textContent = gameState.totalClues;
+
+            // Update difficulty display
+            if (data.difficulty) {
+                elements.eventDifficulty.textContent = `Difficulty: ${data.difficulty}`;
+                elements.eventDifficulty.parentElement.setAttribute('data-difficulty', data.difficulty.toLowerCase());
+            }
             
             elements.guessInput.focus();
             
@@ -120,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Submit score to leaderboard
     async function submitScore() {
         const playerName = elements.playerName.value.trim();
+        const xUsername = document.getElementById('x-username').value.trim();
         if (!playerName) return;
 
         try {
@@ -130,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     name: playerName,
+                    x_username: xUsername,
                     sessionId: gameState.sessionId
                 })
             });
@@ -154,9 +163,16 @@ document.addEventListener('DOMContentLoaded', () => {
             leaderboard.forEach((entry, index) => {
                 const entryElement = document.createElement('div');
                 entryElement.className = 'leaderboard-entry';
+                let nameDisplay = entry.name;
+                if (entry.xProfile) {
+                    nameDisplay = `<a href="${entry.xProfile}" target="_blank" rel="noopener noreferrer">
+                        ${entry.name}
+                        <img src="/static/images/x-logo.png" alt="X Logo" class="x-logo">
+                    </a>`;
+                }
                 entryElement.innerHTML = `
                     <span class="rank">${index + 1}</span>
-                    <span class="name">${entry.name}</span>
+                    <span class="name">${nameDisplay}</span>
                     <span class="time">${entry.solveTime}</span>
                     <span class="clues">${entry.cluesUsed}</span>
                 `;
@@ -215,6 +231,28 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOverModal.classList.add('hidden');
         }
     });
+
+    // Countdown timer functionality
+    function updateCountdown() {
+        const now = new Date();
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(0, 0, 0, 0);
+        
+        const timeLeft = tomorrow - now;
+        
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        
+        document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    // Update countdown every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
 
     // Start the game
     initGame();

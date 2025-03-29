@@ -1,6 +1,6 @@
 [
   {
-    "date": "2025-03-28",
+    "date": "2025-03-29",
     "answer": "The Fall of the Berlin Wall",
     "alt_answers": [
       "The Berlin Wall",
@@ -11,6 +11,7 @@
       "Collapse of the Berlin Wall"
     ],
     "year": 1989,
+    "difficulty": "Easy",
     "clues": [
       "When walls crumble, so do empires.",
       "A pivotal Cold War moment in Europe.",
@@ -21,7 +22,7 @@
     "summary": "On November 9, 1989, the Berlin Wall fell, marking the symbolic end of the Cold War and the beginning of Germany's reunification."
   },
   {
-    "date": "2025-03-29",
+    "date": "2025-03-30",
     "answer": "The Moon Landing",
     "alt_answers": [
       "Moon Landing",
@@ -32,6 +33,7 @@
       "Man on the Moon"
     ],
     "year": 1969,
+    "difficulty": "Easy",
     "clues": [
       "A giant leap for imagination.",
       "A space race victory broadcast to the world.",
@@ -40,6 +42,20 @@
       "Apollo 11's mission showcased human ingenuity."
     ],
     "summary": "On July 20, 1969, Apollo 11 successfully landed on the Moon. Neil Armstrong became the first human to walk on the lunar surface, famously declaring it 'one small step for man, one giant leap for mankind.'"
+  },
+  {
+    "date": "2024-03-31",
+    "year": "1953",
+    "difficulty": "Medium",
+    "clues": [
+      "This medical breakthrough would save millions of lives",
+      "The discovery was announced at the University of Michigan",
+      "It was developed by Dr. Jonas Salk",
+      "It was a vaccine for a devastating viral disease"
+    ],
+    "answer": "Polio Vaccine",
+    "alt_answers": ["Salk Vaccine", "Polio", "Poliomyelitis Vaccine"],
+    "summary": "On this day in 1953, Dr. Jonas Salk announced the successful testing of the polio vaccine at the University of Michigan. This breakthrough would go on to nearly eradicate one of history's most feared diseases."
   }
 ]
 

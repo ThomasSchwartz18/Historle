@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historle - Guess the moment. One clue at a time.</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/leaderboard-entries.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -27,6 +27,9 @@
         <main>
             <div class="game-section">
                 <div class="game-container">
+                    <div class="difficulty-display" aria-label="Event Difficulty">
+                        <span id="event-difficulty">Loading difficulty...</span>
+                    </div>
                     <div class="year-display" aria-label="Event Year">
                         Year: <span id="event-year">????</span>
                     </div>
@@ -53,24 +56,41 @@
                         </div>
                     </form>
                 </div>
-            </div>
 
-            <div id="leaderboard" class="leaderboard">
-                <h2>Leaderboard</h2>
-                <div class="leaderboard-header">
-                    <span class="rank">Rank</span>
-                    <span class="name">Name</span>
-                    <span class="time">Time</span>
-                    <span class="clues">Clues</span>
-                </div>
-                <div id="leaderboard-entries" class="leaderboard-entries">
-                    <!-- Leaderboard entries will be inserted here -->
+                <div id="leaderboard" class="leaderboard">
+                    <h2>Today's Leaderboard</h2>
+                    <div class="leaderboard-header">
+                        <span class="rank">Rank</span>
+                        <span class="name">Name</span>
+                        <span class="time">Time</span>
+                        <span class="clues">Clues</span>
+                    </div>
+                    <div id="leaderboard-entries" class="leaderboard-entries">
+                        <!-- Leaderboard entries will be inserted here -->
+                    </div>
                 </div>
             </div>
         </main>
 
         <footer>
             <p>A daily historical event guessing game</p>
+            <div class="countdown-container">
+                <p>Next historical moment in:</p>
+                <div class="countdown" id="countdown">
+                    <div class="countdown-item">
+                        <span id="countdown-hours">--</span>
+                        <span class="countdown-label">hours</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="countdown-minutes">--</span>
+                        <span class="countdown-label">minutes</span>
+                    </div>
+                    <div class="countdown-item">
+                        <span id="countdown-seconds">--</span>
+                        <span class="countdown-label">seconds</span>
+                    </div>
+                </div>
+            </div>
         </footer>
     </div>
 
@@ -89,11 +109,19 @@
                     <div class="input-group">
                         <input type="text" 
                                id="player-name" 
-                               placeholder="Your name" 
+                               placeholder="Your name to display on the leaderboard" 
                                maxlength="20"
                                aria-label="Enter your name">
-                        <button id="submit-score" aria-label="Submit score">Submit Score</button>
                     </div>
+                    <p>Optional: Enter your X username so others can find you on X!</p>
+                    <div class="input-group">
+                        <input type="text" 
+                               id="x-username" 
+                               placeholder="Your X username (optional)" 
+                               maxlength="30"
+                               aria-label="Enter your X username">
+                    </div>
+                    <button id="submit-score" aria-label="Submit score">Submit Score</button>
                 </div>
                 
                 <button id="share-button" class="share-button">

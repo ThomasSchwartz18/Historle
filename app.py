@@ -79,7 +79,8 @@ def start_game():
         'sessionId': session_id,
         'clue': event['clues'][0],
         'total_clues': len(event['clues']),
-        'year': event['year']
+        'year': event['year'],
+        'difficulty': event.get('difficulty', 'Medium')  # Default to Medium if not specified
     })
 
 @app.route('/api/game/check', methods=['POST'])
@@ -121,6 +122,7 @@ def finish_game():
     data = request.get_json()
     session_id = data.get('sessionId')
     player_name = data.get('name', 'Anonymous')
+    x_username = data.get('x_username', '').strip()
     
     if session_id not in game_sessions:
         return jsonify({'error': 'Invalid session'}), 400
@@ -147,6 +149,10 @@ def finish_game():
         "cluesUsed": session['clues_used'],
         "date": today
     }
+
+    # Add X profile link if username is provided
+    if x_username:
+        leaderboard_entry["xProfile"] = f"https://x.com/{x_username}"
     
     # Update leaderboard
     leaderboard = load_leaderboard()
@@ -177,4 +183,4 @@ def get_leaderboard():
     return jsonify(leaderboard)
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(host='0.0.0.0', port=5001, debug=True) 

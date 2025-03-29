@@ -1,33 +1,3 @@
 [
-  {
-    "name": "Tomato",
-    "solveTime": "00:00:36.047",
-    "timestamp": "2025-03-28T22:35:46.722706Z",
-    "cluesUsed": 1
-  },
-  {
-    "name": "Alexis",
-    "solveTime": "00:01:11.638",
-    "timestamp": "2025-03-28T22:46:15.056791Z",
-    "cluesUsed": 2
-  },
-  {
-    "name": "Test",
-    "solveTime": "00:00:15.955",
-    "timestamp": "2025-03-29T03:57:57.781738Z",
-    "cluesUsed": 4
-  },
-  {
-    "name": "Thomas",
-    "solveTime": "00:00:52.246",
-    "timestamp": "2025-03-29T03:56:43.458757Z",
-    "cluesUsed": 5
-  },
-  {
-    "name": "Thomas",
-    "solveTime": "00:00:24.125",
-    "timestamp": "2025-03-29T04:05:53.640024Z",
-    "cluesUsed": 1,
-    "date": "2025-03-29"
-  }
+
 ]
