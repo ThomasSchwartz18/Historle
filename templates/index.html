@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historle - Guess the moment. One clue at a time.</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo1.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,10 +26,16 @@
             <div class="header-container">
                 <div class="header-content">
                     <div class="header-title">
-                        <img src="{{ url_for('static', filename='images/logo-bg-removed.png') }}" alt="Historle Logo" class="header-logo">
-                        <h1>Historle</h1>
+                        <div class="logo-container">
+                            <img src="{{ url_for('static', filename='images/floating-img-1.png') }}" alt="Floating Image 1" class="floating-img floating-img-1">
+                            <img src="{{ url_for('static', filename='images/floating-img-2.png') }}" alt="Floating Image 2" class="floating-img floating-img-2">
+                            <img src="{{ url_for('static', filename='images/floating-img-3.png') }}" alt="Floating Image 3" class="floating-img floating-img-3">
+                            <img src="{{ url_for('static', filename='images/floating-img-4.png') }}" alt="Floating Image 4" class="floating-img floating-img-4">
+                            <img src="{{ url_for('static', filename='images/web-logo.png') }}" alt="Historle Logo" class="header-logo">
+                        </div>
                     </div>
                     <p class="tagline">Guess the moment. One clue at a time.</p>
+                    <p class="tagline">Guess quickly and display your name on the leaderboard!</p>
                 </div>
             </div>
         </header>        
@@ -123,7 +129,7 @@
                                maxlength="20"
                                aria-label="Enter your name">
                     </div>
-                    <p>Optional: Enter your X username so others can find you on X!</p>
+                    <p>Optional: Enter your X username to allow others to find you from the leaderboard!</p>
                     <div class="input-group">
                         <input type="text" 
                                id="x-username" 
