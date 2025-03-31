@@ -1,259 +1,304 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const gameState = {
-        currentClueIndex: 0,
-        totalClues: 4,
-        gameOver: false,
-        year: null,
-        sessionId: null
-    };
+    // Global game state variables
+    let currentEvent = null;
+    let currentClueIndex = 0;
+    let remainingGuesses = 5;
+    let correctAnswer = "";
+    let altAnswers = []; // Array of alternate valid answers
+    let startTime = Date.now();
 
-    const elements = {
-        guessForm: document.getElementById('guess-form'),
-        guessInput: document.getElementById('guess-input'),
-        currentClue: document.getElementById('current-clue'),
-        previousClues: document.getElementById('previous-clues'),
-        guessesLeft: document.getElementById('guesses-left'),
-        gameOver: document.getElementById('game-over'),
-        resultHeader: document.getElementById('result-header'),
-        correctAnswer: document.getElementById('correct-answer'),
-        eventSummary: document.getElementById('event-summary'),
-        shareButton: document.getElementById('share-button'),
-        eventYear: document.getElementById('event-year'),
-        eventDifficulty: document.getElementById('event-difficulty'),
-        nameEntry: document.getElementById('name-entry'),
-        playerName: document.getElementById('player-name'),
-        submitScore: document.getElementById('submit-score'),
-        leaderboardEntries: document.getElementById('leaderboard-entries')
-    };
+    // DOM elements for updating UI
+    const currentClueEl = document.getElementById("current-clue");
+    const previousCluesEl = document.getElementById("previous-clues");
+    const guessesLeftEl = document.getElementById("guesses-left");
+    const guessForm = document.getElementById("guess-form");
+    const guessInput = document.getElementById("guess-input");
+    const gameOverModal = document.getElementById("game-over");
+    const modalCloseBtn = document.getElementById("modal-close");
+    const resultHeaderEl = document.getElementById("result-header");
+    const correctAnswerEl = document.getElementById("correct-answer");
+    const eventSummaryEl = document.getElementById("event-summary");
+    const nameEntryDiv = document.getElementById("name-entry");
+    const submitScoreBtn = document.getElementById("submit-score");
+    const shareButton = document.getElementById("share-button");
 
-    // Initialize the game
-    async function initGame() {
-        try {
-            const response = await fetch('/api/game/start');
-            const data = await response.json();
-            
-            gameState.totalClues = data.total_clues;
-            gameState.year = data.year;
-            gameState.sessionId = data.sessionId;
-            
-            elements.currentClue.textContent = data.clue;
-            elements.eventYear.textContent = data.year;
-            elements.guessesLeft.textContent = gameState.totalClues;
-
-            // Update difficulty display
-            if (data.difficulty) {
-                elements.eventDifficulty.textContent = `Difficulty: ${data.difficulty}`;
-                elements.eventDifficulty.parentElement.setAttribute('data-difficulty', data.difficulty.toLowerCase());
-            }
-            
-            elements.guessInput.focus();
-            
-            // Load initial leaderboard
-            loadLeaderboard();
-        } catch (error) {
-            console.error('Failed to initialize game:', error);
-            elements.currentClue.textContent = 'Failed to load game. Please refresh the page.';
-        }
-    }
-
-    // Handle guess submission
-    async function handleGuess(event) {
-        event.preventDefault();
-        
-        if (gameState.gameOver) return;
-
-        const guess = elements.guessInput.value.trim();
-        if (!guess) return;
-
-        try {
-            const response = await fetch('/api/game/check', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    guess: guess,
-                    clueIndex: gameState.currentClueIndex,
-                    sessionId: gameState.sessionId
-                })
-            });
-
-            const data = await response.json();
-            processGuessResult(data, guess);
-        } catch (error) {
-            console.error('Failed to submit guess:', error);
-        }
-
-        elements.guessInput.value = '';
-    }
-
-    // Process the guess result
-    function processGuessResult(data, guess) {
-        if (data.correct) {
-            showGameOver(true, data);
-            elements.nameEntry.classList.remove('hidden');
-        } else {
-            if (data.nextClue) {
-                // Move current clue to previous clues
-                const clueElement = document.createElement('div');
-                clueElement.className = 'clue';
-                clueElement.textContent = elements.currentClue.textContent;
-                elements.previousClues.insertBefore(clueElement, elements.previousClues.firstChild);
-
-                // Show next clue
-                elements.currentClue.textContent = data.nextClue;
-                gameState.currentClueIndex++;
-                elements.guessesLeft.textContent = gameState.totalClues - gameState.currentClueIndex;
-            } else {
-                showGameOver(false, data);
-            }
-        }
-    }
-
-    // Show game over screen
-    function showGameOver(won, data) {
-        gameState.gameOver = true;
-        elements.gameOver.classList.remove('hidden');
-        elements.guessForm.style.display = 'none';
-
-        elements.resultHeader.textContent = won ? 'Congratulations!' : 'Game Over';
-        elements.correctAnswer.textContent = `The correct answer was: ${data.answer}`;
-        elements.eventSummary.textContent = data.summary;
-
-        // Update share button
-        elements.shareButton.addEventListener('click', () => shareResult(won));
-    }
-
-    // Submit score to leaderboard
-    async function submitScore() {
-        const playerName = elements.playerName.value.trim();
-        const xUsername = document.getElementById('x-username').value.trim();
-        if (!playerName) return;
-
-        try {
-            const response = await fetch('/api/game/finish', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    name: playerName,
-                    x_username: xUsername,
-                    sessionId: gameState.sessionId
-                })
-            });
-
-            const data = await response.json();
-            if (data.status === 'success') {
-                elements.nameEntry.classList.add('hidden');
-                loadLeaderboard();
-            }
-        } catch (error) {
-            console.error('Failed to submit score:', error);
-        }
-    }
-
-    // Load and display leaderboard
-    async function loadLeaderboard() {
-        try {
-            const response = await fetch('/api/leaderboard');
-            const leaderboard = await response.json();
-            
-            elements.leaderboardEntries.innerHTML = '';
-            leaderboard.forEach((entry, index) => {
-                const entryElement = document.createElement('div');
-                entryElement.className = 'leaderboard-entry';
-                let nameDisplay = entry.name;
-                if (entry.xProfile) {
-                    nameDisplay = `<a href="${entry.xProfile}" target="_blank" rel="noopener noreferrer">
-                        ${entry.name}
-                        <img src="/static/images/x-logo.png" alt="X Logo" class="x-logo">
-                    </a>`;
+    // ----------------------------------------------------------------
+    // Fetch today's event from the API and initialize game state.
+    // ----------------------------------------------------------------
+    function fetchEvent() {
+        fetch('/api/event')
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    currentClueEl.textContent = "Error loading event.";
+                    return;
                 }
-                entryElement.innerHTML = `
-                    <span class="rank">${index + 1}</span>
-                    <span class="name">${nameDisplay}</span>
-                    <span class="time">${entry.solveTime}</span>
-                    <span class="clues">${entry.cluesUsed}</span>
-                `;
-                elements.leaderboardEntries.appendChild(entryElement);
+                currentEvent = data;
+                // For game functionality, we assume that the API returns the answer and alternate answers.
+                correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
+                altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
+                // Initialize clue index and reset remaining guesses.
+                currentClueIndex = 0;
+                remainingGuesses = 5;
+                updateClueDisplay();
+                // Display additional event info (year and difficulty)
+                document.getElementById("event-year").textContent = currentEvent.year || "????";
+                document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
+            })
+            .catch(error => {
+                console.error("Error fetching event:", error);
+                currentClueEl.textContent = "Error loading event.";
             });
-        } catch (error) {
-            console.error('Failed to load leaderboard:', error);
+    }
+
+    // ----------------------------------------------------------------
+    // Update the displayed clue and remaining guesses.
+    // ----------------------------------------------------------------
+    function updateClueDisplay() {
+        if (currentEvent && currentEvent.clues && currentClueIndex < currentEvent.clues.length) {
+            currentClueEl.textContent = currentEvent.clues[currentClueIndex];
+            guessesLeftEl.textContent = remainingGuesses;
         }
     }
 
-    // Share result
-    function shareResult(won) {
-        const emoji = won ? '🎉' : '😔';
-        const guessCount = gameState.currentClueIndex + 1;
-        const shareText = `Historle ${new Date().toLocaleDateString()}\n${emoji} ${won ? `Solved in ${guessCount}` : 'Failed after 4'} guesses!\nPlay at: [your-website-url]`;
-        
-        if (navigator.share) {
-            navigator.share({
-                text: shareText
-            }).catch(console.error);
+    // ----------------------------------------------------------------
+    // Handle user's guess submission.
+    // ----------------------------------------------------------------
+    function handleGuess(e) {
+        e.preventDefault();
+        const userGuess = guessInput.value.trim().toLowerCase();
+        if (!userGuess) return;
+
+        // Check if the guess is correct against the answer or any alternate answer.
+        if (userGuess === correctAnswer || altAnswers.includes(userGuess)) {
+            finishGame(true);
         } else {
-            navigator.clipboard.writeText(shareText)
-                .then(() => alert('Result copied to clipboard!'))
-                .catch(console.error);
+            // Move the current clue to previous clues with animation
+            if (currentClueIndex < currentEvent.clues.length) {
+                const prevClueText = currentEvent.clues[currentClueIndex];
+                const prevClueDiv = document.createElement("div");
+                prevClueDiv.className = "clue pop-in";
+                prevClueDiv.textContent = prevClueText;
+                previousCluesEl.appendChild(prevClueDiv);
+            }
+
+            // Move to next clue and decrement remaining guesses.
+            currentClueIndex++;
+            remainingGuesses--;
+            if (remainingGuesses <= 0 || currentClueIndex >= currentEvent.clues.length) {
+                finishGame(false);
+            } else {
+                updateClueDisplay();
+            }
+        }
+        // Clear the input field.
+        guessInput.value = "";
+    }
+
+    // ----------------------------------------------------------------
+    // Finish the game: display the appropriate modal for win or loss.
+    // ----------------------------------------------------------------
+    function finishGame(success) {
+        // Stop further submissions.
+        guessForm.removeEventListener("submit", handleGuess);
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000); // time in seconds
+
+        // Fill modal with event details.
+        correctAnswerEl.textContent = `Answer: ${correctAnswer.toUpperCase()}`;
+        eventSummaryEl.textContent = currentEvent.summary || "";
+
+        if (success) {
+            resultHeaderEl.textContent = "Congratulations! You guessed correctly!";
+            // Show the name entry for leaderboard submission.
+            nameEntryDiv.classList.remove("hidden");
+            submitScoreBtn.addEventListener("click", submitScore);
+        } else {
+            resultHeaderEl.textContent = "Game Over!";
+            nameEntryDiv.classList.add("hidden");
+        }
+        gameOverModal.classList.remove("hidden");
+    }
+
+    // ----------------------------------------------------------------
+    // Submit player's score to the leaderboard via the API.
+    // ----------------------------------------------------------------
+    function submitScore() {
+        const playerName = document.getElementById("player-name").value.trim();
+        const xUsername = document.getElementById("x-username").value.trim();
+        if (!playerName) {
+            alert("Please enter your name for the leaderboard.");
+            return;
+        }
+        const duration = Date.now() - startTime;
+        const hours = Math.floor(duration / 3600000);
+        const minutes = Math.floor((duration % 3600000) / 60000);
+        const seconds = Math.floor((duration % 60000) / 1000);
+        const centiseconds = Math.floor((duration % 1000) / 10);
+
+        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
+
+        // Number of clues used is (currentClueIndex + 1)
+        const cluesUsed = currentClueIndex + 1;
+        const scoreData = {
+            name: playerName,
+            x_username: xUsername,
+            time: formattedTime,
+            clues: cluesUsed
+        };
+
+        fetch('/api/score', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(scoreData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert("Error submitting score. Please try again.");
+            } else {
+                // Instead of alerting, simply remove the input section from the game-over popup.
+                nameEntryDiv.classList.add("hidden");
+                // Update the leaderboard display in real time.
+                updateLeaderboard();
+            }
+        })
+        .catch(error => {
+            console.error("Error submitting score:", error);
+            alert("Error submitting score. Please try again.");
+        });
+    }
+
+    // ----------------------------------------------------------------
+    // Update the leaderboard by fetching the top 10 entries from the API.
+    // ----------------------------------------------------------------
+    function updateLeaderboard() {
+        fetch('/api/leaderboard')
+            .then(response => response.json())
+            .then(data => {
+                const leaderboardEntriesEl = document.getElementById("leaderboard-entries");
+                leaderboardEntriesEl.innerHTML = ""; // Clear existing entries
+                data.forEach((entry, index) => {
+                    const entryDiv = document.createElement("div");
+                    entryDiv.className = "leaderboard-entry";
+
+                    // Rank
+                    const rankSpan = document.createElement("span");
+                    rankSpan.className = "rank";
+                    rankSpan.textContent = index + 1;
+                    entryDiv.appendChild(rankSpan);
+
+                    // Name with optional X profile link and x-logo if linked
+                    const nameSpan = document.createElement("span");
+                    nameSpan.className = "name";
+                    if (entry.x_profile) {
+                        const anchor = document.createElement("a");
+                        anchor.href = entry.x_profile;
+                        anchor.textContent = entry.name;
+                        
+                        // Create and append the x-logo image
+                        const xLogoImg = document.createElement("img");
+                        xLogoImg.src = "/static/images/x-logo.svg";
+                        xLogoImg.alt = "X Logo";
+                        xLogoImg.className = "x-logo";
+                        anchor.appendChild(xLogoImg);
+                        
+                        nameSpan.appendChild(anchor);
+                    } else {
+                        nameSpan.textContent = entry.name;
+                    }
+                    entryDiv.appendChild(nameSpan);
+
+                    // Solve time
+                    const timeSpan = document.createElement("span");
+                    timeSpan.className = "time";
+                    timeSpan.textContent = entry.solve_time;
+                    entryDiv.appendChild(timeSpan);
+
+                    // Clues used
+                    const cluesSpan = document.createElement("span");
+                    cluesSpan.className = "clues";
+                    cluesSpan.textContent = entry.clues_used;
+                    entryDiv.appendChild(cluesSpan);
+
+                    leaderboardEntriesEl.appendChild(entryDiv);
+                });
+            })
+            .catch(err => console.error("Error updating leaderboard:", err));
+    }
+
+    // ----------------------------------------------------------------
+    // Handle Countdown Timer
+    // ----------------------------------------------------------------
+    function startCountdown() {
+        const countdownHours = document.getElementById("countdown-hours");
+        const countdownMinutes = document.getElementById("countdown-minutes");
+        const countdownSeconds = document.getElementById("countdown-seconds");
+    
+        function updateCountdown() {
+            const now = new Date();
+    
+            // Calculate the next UTC midnight
+            const nextUtcMidnight = new Date(Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() + 1, // next day
+                0, 0, 0
+            ));
+    
+            const diff = nextUtcMidnight - now;
+    
+            if (diff <= 0) {
+                countdownHours.textContent = "00";
+                countdownMinutes.textContent = "00";
+                countdownSeconds.textContent = "00";
+
+                location.reload();
+                return;
+            }
+    
+            const totalSeconds = Math.floor(diff / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+    
+            countdownHours.textContent = String(hours).padStart(2, "0");
+            countdownMinutes.textContent = String(minutes).padStart(2, "0");
+            countdownSeconds.textContent = String(seconds).padStart(2, "0");
+        }
+    
+        updateCountdown(); // Update immediately
+        setInterval(updateCountdown, 1000); // Update every second
+    }
+     
+
+    // ----------------------------------------------------------------
+    // Handle share button click: copy share message to clipboard.
+    // ----------------------------------------------------------------
+    function handleShare() {
+        const shareMessage = `I just played Historle! ${resultHeaderEl.textContent} My time: ${Math.floor((Date.now() - startTime)/1000)} seconds. Check it out!`;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(shareMessage)
+                .then(() => console.log("Result copied to clipboard!"))
+                .catch(err => console.error("Failed to copy result.", err));
+        } else {
+            console.log(shareMessage);
         }
     }
 
     // Event listeners
-    elements.guessForm.addEventListener('submit', handleGuess);
-    elements.guessInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleGuess(e);
-        }
+    modalCloseBtn.addEventListener("click", () => {
+        gameOverModal.classList.add("hidden");
     });
+    shareButton.addEventListener("click", handleShare);
+    guessForm.addEventListener("submit", handleGuess);
 
-    elements.submitScore.addEventListener('click', submitScore);
-    elements.playerName.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            submitScore();
-        }
-    });
+    // Fetch the event and leaderboard immediately on page load
+    fetchEvent();
+    updateLeaderboard();
+    startCountdown();
 
-    // Add modal close functionality
-    const modalClose = document.getElementById('modal-close');
-    const gameOverModal = document.getElementById('game-over');
-
-    modalClose.addEventListener('click', function() {
-        gameOverModal.classList.add('hidden');
-    });
-
-    // Close modal when clicking overlay
-    gameOverModal.addEventListener('click', function(e) {
-        if (e.target === gameOverModal) {
-            gameOverModal.classList.add('hidden');
-        }
-    });
-
-    // Countdown timer functionality
-    function updateCountdown() {
-        const now = new Date();
-        const tomorrow = new Date(now);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(0, 0, 0, 0);
-        
-        const timeLeft = tomorrow - now;
-        
-        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-        
-        document.getElementById('countdown-hours').textContent = String(hours).padStart(2, '0');
-        document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
-        document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
-    }
-
-    // Update countdown every second
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-
-    // Start the game
-    initGame();
-}); 
+    // Optionally, poll the leaderboard every 10 seconds to keep it updated in real time.
+    setInterval(updateLeaderboard, 10000);
+});

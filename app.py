@@ -1,186 +1,161 @@
-from flask import Flask, render_template, jsonify, request
-import json
-from datetime import datetime
-import time
-from utils.checker import check_answer
+import os
+from datetime import datetime, date, timezone
+from flask import Flask, render_template, jsonify, request, abort
+from flask_cors import CORS  # For secure cross-origin requests if needed
+
+# Import the Supabase client to securely interact with our database.
+from supabase import create_client, Client
 
 app = Flask(__name__)
+CORS(app)
 
-# Global variable to store game start times for each session
-game_sessions = {}
+# Load Supabase credentials from environment variables (set these securely on Heroku)
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+if not SUPABASE_URL or not SUPABASE_KEY:
+    raise Exception("Supabase credentials not set in environment variables")
 
-def load_daily_event():
-    """Load and return the event for the current date."""
-    with open('data/events.json', 'r') as f:
-        events = json.load(f)
-        
-    today = datetime.now().strftime('%Y-%m-%d')
-    for event in events:
-        if event['date'] == today:
-            return event
-            
-    # If no event for today, return the first event (for demo purposes)
-    return events[0]
+# Create a secure connection to the Supabase backend
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-def load_leaderboard():
-    """Load the leaderboard data from JSON file."""
+# ---------------------------
+# Utility Function: Fetch Today's Event from Supabase
+# ---------------------------
+def get_event_for_today():
+    """
+    Query the Supabase daily_events table for the event matching today's date.
+    Converts 'alt_answers' and 'clues' from semicolon-separated strings into lists.
+    """
+    today_str = date.today().strftime("%Y-%m-%d")
     try:
-        with open('data/leaderboard.json', 'r') as f:
-            all_entries = json.load(f)
-            
-        # Filter for today's entries only
-        today = datetime.now().strftime('%Y-%m-%d')
-        return [entry for entry in all_entries if entry.get('date') == today]
-    except (FileNotFoundError, json.JSONDecodeError):
-        return []
+        result = supabase.table("daily_events") \
+                         .select("*") \
+                         .eq("date", today_str) \
+                         .single() \
+                         .execute()
+        event = result.data
+        if not event:
+            return None
+        # Process semicolon-separated fields into lists
+        if "alt_answers" in event and isinstance(event["alt_answers"], str):
+            event["alt_answers"] = [a.strip() for a in event["alt_answers"].split(";") if a.strip()]
+        if "clues" in event and isinstance(event["clues"], str):
+            event["clues"] = [c.strip() for c in event["clues"].split(";") if c.strip()]
+        return event
+    except Exception as e:
+        print("Error fetching event from Supabase:", e)
+        return None
 
-def save_leaderboard(new_entries):
-    """Save the leaderboard data to JSON file, preserving historical data."""
-    try:
-        with open('data/leaderboard.json', 'r') as f:
-            all_entries = json.load(f)
-    except (FileNotFoundError, json.JSONDecodeError):
-        all_entries = []
-    
-    # Remove today's entries from the historical data
-    today = datetime.now().strftime('%Y-%m-%d')
-    historical_entries = [entry for entry in all_entries if entry.get('date') != today]
-    
-    # Add new entries for today
-    all_entries = historical_entries + new_entries
-    
-    with open('data/leaderboard.json', 'w') as f:
-        json.dump(all_entries, f, indent=2)
-
-def time_to_seconds(time_str):
-    """Convert HH:MM:SS.mmm format to total seconds for sorting."""
-    hours, minutes, seconds = time_str.split(':')
-    seconds, milliseconds = seconds.split('.')
-    total_seconds = int(hours) * 3600 + int(minutes) * 60 + int(seconds) + int(milliseconds) / 1000
-    return total_seconds
-
-@app.route('/')
+# ---------------------------
+# Route Definitions
+# ---------------------------
+@app.route("/")
 def index():
-    """Render the main game page."""
-    return render_template('index.html')
+    """
+    Serves the main HTML page (templates/index.html). This page loads the game interface
+    and references our static assets (CSS and game.js) which handle front-end functionality.
+    """
+    return render_template("index.html")
 
-@app.route('/api/game/start', methods=['GET'])
-def start_game():
-    """Initialize the game with the first clue and start timing."""
-    # Generate a unique session ID
-    session_id = str(time.time())
-    game_sessions[session_id] = {
-        'start_time': time.perf_counter(),
-        'clues_used': 0
-    }
-    
-    event = load_daily_event()
-    return jsonify({
-        'sessionId': session_id,
-        'clue': event['clues'][0],
-        'total_clues': len(event['clues']),
-        'year': event['year'],
-        'difficulty': event.get('difficulty', 'Medium')  # Default to Medium if not specified
-    })
+@app.route("/api/event", methods=["GET"])
+def api_event():
+    """
+    API endpoint to retrieve today's historical event.
+    Returns only the necessary details: year, difficulty, clues, summary, date,
+    and (for game functionality) the answer and alternate answers.
+    """
+    event = get_event_for_today()
+    if not event:
+        return jsonify({"error": "No event found for today"}), 404
 
-@app.route('/api/game/check', methods=['POST'])
-def check_guess():
-    """Check if the guess is correct and update clues used."""
-    data = request.get_json()
-    guess = data.get('guess', '').strip()
-    clue_index = data.get('clueIndex', 0)
-    session_id = data.get('sessionId')
-    
-    if session_id not in game_sessions:
-        return jsonify({'error': 'Invalid session'}), 400
-    
-    event = load_daily_event()
-    game_sessions[session_id]['clues_used'] = clue_index + 1
-    
-    is_correct = check_answer(guess, event['answer'], event['alt_answers'])
-    
     response = {
-        'correct': is_correct,
-        'clueIndex': clue_index
+        "year": event.get("year"),
+        "difficulty": event.get("difficulty"),
+        "clues": event.get("clues"),
+        "summary": event.get("summary"),
+        "date": event.get("date"),
+        "answer": event.get("answer"),
+        "alt_answers": event.get("alt_answers")
     }
-    
-    if is_correct:
-        response['summary'] = event['summary']
-        response['answer'] = event['answer']
-    elif clue_index + 1 < len(event['clues']):
-        response['nextClue'] = event['clues'][clue_index + 1]
-    else:
-        response['gameOver'] = True
-        response['summary'] = event['summary']
-        response['answer'] = event['answer']
-    
     return jsonify(response)
 
-@app.route('/api/game/finish', methods=['POST'])
-def finish_game():
-    """Record the game result in the leaderboard."""
+@app.route("/api/leaderboard", methods=["GET"])
+def api_leaderboard():
+    """
+    API endpoint to retrieve the top 10 leaderboard entries for today.
+    Sorting is performed by solve_time (ascending) and by clues_used (ascending) in case of ties.
+    """
+    today_str = date.today().strftime("%Y-%m-%d")
+    try:
+        result = supabase.table("leaderboard") \
+                         .select("*") \
+                         .eq("date", today_str) \
+                         .order("solve_time", desc=False) \
+                         .order("clues_used", desc=False) \
+                         .limit(10) \
+                         .execute()
+        leaderboard_data = result.data
+        return jsonify(leaderboard_data)
+    except Exception as e:
+        print("Leaderboard fetch error:", e)
+        return jsonify({"error": "Failed to fetch leaderboard data"}), 500
+
+@app.route("/api/score", methods=["POST"])
+def api_score():
+    """
+    API endpoint to submit a player's score.
+    Expects a JSON payload with 'name', 'x_username' (optional), 'time', and 'clues'.
+    Implements input validation and sanitization to protect against malicious data.
+    
+    Note: The incoming JSON keys are remapped to the expected database column names:
+          - "time" -> "solve_time"
+          - "clues" -> "clues_used"
+          - "x_username" -> "x_profile"
+    """
+    today_str = date.today().strftime("%Y-%m-%d")
     data = request.get_json()
-    session_id = data.get('sessionId')
-    player_name = data.get('name', 'Anonymous')
-    x_username = data.get('x_username', '').strip()
+    if not data:
+        return jsonify({"error": "Invalid data"}), 400
+
+    # Extract and sanitize input values
+    name = data.get("name", "").strip()
+    x_username = data.get("x_username", "").strip()
+    time_taken = data.get("time")
+    clues_used = data.get("clues")
     
-    if session_id not in game_sessions:
-        return jsonify({'error': 'Invalid session'}), 400
-    
-    session = game_sessions[session_id]
-    end_time = time.perf_counter()
-    elapsed = end_time - session['start_time']
-    
-    # Compute time components
-    hours = int(elapsed // 3600)
-    minutes = int((elapsed % 3600) // 60)
-    seconds = int(elapsed % 60)
-    milliseconds = int((elapsed - int(elapsed)) * 1000)
-    
-    # Format elapsed time
-    formatted_time = f"{hours:02}:{minutes:02}:{seconds:02}.{milliseconds:03}"
-    
-    # Create leaderboard entry
-    today = datetime.now().strftime('%Y-%m-%d')
-    leaderboard_entry = {
-        "name": player_name,
-        "solveTime": formatted_time,
-        "timestamp": datetime.utcnow().isoformat() + "Z",
-        "cluesUsed": session['clues_used'],
-        "date": today
+    # Basic validation for expected fields
+    if not name or not isinstance(time_taken, str) or not isinstance(clues_used, int):
+        return jsonify({"error": "Missing or invalid fields"}), 400
+
+    # Limit input lengths for security
+    if len(name) > 20:
+        name = name[:20]
+    if len(x_username) > 30:
+        x_username = x_username[:30]
+
+    # Prepend "https://x.com/" to the inputted x_username if provided
+    x_profile = f"https://x.com/{x_username}" if x_username else ""
+
+    # Map incoming keys to the database schema
+    score_entry = {
+        "name": name,
+        "x_profile": x_profile,          # Remapped key with URL prepended
+        "solve_time": time_taken,         # Remapped key
+        "clues_used": clues_used,         # Remapped key
+        "date": today_str,
+        "timestamp": datetime.now(timezone.utc).isoformat()  # Use timezone-aware UTC datetime
     }
 
-    # Add X profile link if username is provided
-    if x_username:
-        leaderboard_entry["xProfile"] = f"https://x.com/{x_username}"
-    
-    # Update leaderboard
-    leaderboard = load_leaderboard()
-    leaderboard.append(leaderboard_entry)
-    
-    # Sort leaderboard by solve time first, then by clues used
-    leaderboard.sort(key=lambda x: (time_to_seconds(x['solveTime']), x['cluesUsed']))
-    
-    # Keep only top 100 entries for today
-    leaderboard = leaderboard[:100]
-    save_leaderboard(leaderboard)
-    
-    # Clean up session
-    del game_sessions[session_id]
-    
-    return jsonify({
-        "status": "success",
-        "entry": leaderboard_entry,
-        "rank": leaderboard.index(leaderboard_entry) + 1
-    })
+    try:
+        result = supabase.table("leaderboard").insert(score_entry).execute()
+        return jsonify({"success": True, "entry": result.data}), 201
+    except Exception as e:
+        print("Score submission error:", e)
+        return jsonify({"error": "Failed to submit score"}), 500
 
-@app.route('/api/leaderboard', methods=['GET'])
-def get_leaderboard():
-    """Get the current leaderboard."""
-    leaderboard = load_leaderboard()
-    # Ensure leaderboard is sorted by time first, then clues
-    leaderboard.sort(key=lambda x: (time_to_seconds(x['solveTime']), x['cluesUsed']))
-    return jsonify(leaderboard)
-
-if __name__ == '__main__':
+# ---------------------------
+# Main Application Entry Point
+# ---------------------------
+if __name__ == "__main__":
+    # In production, debug should be disabled for security reasons.
     app.run(host='0.0.0.0', port=5001, debug=True) 
