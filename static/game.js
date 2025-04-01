@@ -80,6 +80,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------------------
+    // Handle dynamic day streak counter
+    // ----------------------------------------------------------------
+    function animateStreakChange(from, to) {
+        const mainEl = document.getElementById("streak-count-main");
+        const modalEl = document.getElementById("streak-count-modal");
+    
+        let current = from;
+        const increment = from < to ? 1 : -1;
+    
+        const interval = setInterval(() => {
+            current += increment;
+            if (mainEl) mainEl.textContent = current;
+            if (modalEl) modalEl.textContent = current;
+            if (current === to) clearInterval(interval);
+        }, 150);
+    }      
+
+    // ----------------------------------------------------------------
     // Handle user's guess submission.
     // ----------------------------------------------------------------
     function handleGuess(e) {
@@ -120,28 +138,71 @@ document.addEventListener('DOMContentLoaded', () => {
         // Stop further submissions.
         guessForm.removeEventListener("submit", handleGuess);
         const timeTaken = Math.floor((Date.now() - startTime) / 1000); // time in seconds
-
+    
         // Fill modal with event details.
         correctAnswerEl.textContent = `Answer: ${correctAnswer.toUpperCase()}`;
         eventSummaryEl.textContent = currentEvent.summary || "";
-
+    
+        // Get the previous streak before changing anything
+        const priorStreak = parseInt(localStorage.getItem("historle_streak") || "0", 10);
+        let newStreak = 0;
+    
         if (success) {
             resultHeaderEl.textContent = "Congratulations! You guessed correctly!";
-            // Show the name entry for leaderboard submission.
             nameEntryDiv.classList.remove("hidden");
             submitScoreBtn.addEventListener("click", submitScore);
+    
+            // Store the win and update streak
+            if (currentEvent && currentEvent.date) {
+                const today = currentEvent.date;
+                let wins = JSON.parse(localStorage.getItem("historle_wins") || "[]");
+    
+                // Avoid duplicates
+                if (!wins.includes(today)) {
+                    wins.push(today);
+                    localStorage.setItem("historle_wins", JSON.stringify(wins));
+                }
+    
+                newStreak = calculateStreak(wins);
+                localStorage.setItem("historle_streak", newStreak);
+                animateStreakChange(priorStreak, newStreak);
+            }
         } else {
             resultHeaderEl.textContent = "Game Over!";
             nameEntryDiv.classList.add("hidden");
+    
+            // Reset streak on loss
+            localStorage.setItem("historle_streak", 0);
+            animateStreakChange(priorStreak, 0);
         }
-
+    
         // Mark today's game as completed in localStorage
         if (currentEvent && currentEvent.date) {
             localStorage.setItem("played_" + currentEvent.date, "true");
         }
-
+    
         gameOverModal.classList.remove("hidden");
-    }
+    }    
+
+    // ----------------------------------------------------------------
+    // Update and display the current streak
+    // ----------------------------------------------------------------
+    function calculateStreak(winDates) {
+        const sorted = winDates.sort();
+        let streak = 0;
+        let currentDate = new Date();
+    
+        for (let i = sorted.length - 1; i >= 0; i--) {
+            const date = new Date(sorted[i]);
+            const daysAgo = Math.floor((currentDate - date) / (1000 * 60 * 60 * 24));
+            if (daysAgo === streak) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }    
 
     // ----------------------------------------------------------------
     // Submit player's score to the leaderboard via the API.
@@ -318,10 +379,51 @@ document.addEventListener('DOMContentLoaded', () => {
     shareButton.addEventListener("click", handleShare);
     guessForm.addEventListener("submit", handleGuess);
 
+    // Debug button reveal on Shift + D
+    document.addEventListener("keydown", (e) => {
+        if (e.shiftKey && e.key.toLowerCase() === "d") {
+            const debugBtn = document.getElementById("debug-btn");
+            if (debugBtn) debugBtn.style.display = "block";
+        }
+    });
+
+    // Debug functionality
+    const debugBtn = document.getElementById("debug-btn");
+    if (debugBtn) {
+        debugBtn.addEventListener("click", () => {
+            const today = currentEvent?.date;
+            const wins = JSON.parse(localStorage.getItem("historle_wins") || "[]");
+            const hasPlayedToday = localStorage.getItem("played_" + today) !== null;
+            const streak = localStorage.getItem("historle_streak") || "0";
+
+            console.log("🧪 Debug Info:");
+            console.log("Wins:", wins);
+            console.log("Current Streak:", streak);
+            console.log("Played today:", hasPlayedToday);
+
+            const confirmReset = confirm("Reset streak and today's play flag?");
+            if (confirmReset) {
+                localStorage.removeItem("historle_streak");
+                localStorage.removeItem("played_" + today);
+                localStorage.setItem("historle_wins", JSON.stringify(wins.filter(d => d !== today)));
+                alert("Streak and today's play flag have been reset.");
+                location.reload();
+            }
+        });
+    }
+
     // Fetch the event and leaderboard immediately on page load
     fetchEvent();
     updateLeaderboard();
     startCountdown();
+
+    // Initialize streak display
+    const winDates = JSON.parse(localStorage.getItem("historle_wins") || "[]");
+    const streakMain = document.getElementById("streak-count-main");
+    const streakModal = document.getElementById("streak-count-modal");
+    const currentStreak = calculateStreak(winDates);
+    if (streakMain) streakMain.textContent = currentStreak;
+    if (streakModal) streakModal.textContent = currentStreak;
 
     // Optionally, poll the leaderboard every 10 seconds to keep it updated in real time.
     setInterval(updateLeaderboard, 10000);
@@ -330,6 +432,12 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener("keydown", (e) => {
         if (e.key === "r" && e.ctrlKey) {
             localStorage.clear();
+            location.reload();
+        }
+        // Reset streak for testing (REMOVE IN PRODUCTION)
+        if (e.ctrlKey && e.key === "Backspace") {
+            localStorage.removeItem("historle_wins");
+            localStorage.removeItem("historle_streak");
             location.reload();
         }
     });

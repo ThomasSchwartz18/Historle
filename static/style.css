@@ -718,4 +718,12 @@ footer {
         opacity: 1;
         transform: translate(0, 0) rotate(0deg);
     }
+}
+
+.streak-display {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--accent-color);
+    text-align: center;
+    margin-top: 1rem;
 } 
