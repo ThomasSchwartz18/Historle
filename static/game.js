@@ -43,6 +43,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 currentEvent = data;
+
+                // Check if player has already played today's event
+                const alreadyPlayed = localStorage.getItem("played_" + currentEvent.date);
+                if (alreadyPlayed) {
+                    currentClueEl.textContent = `You've already played today's event. Come back tomorrow! The answer was: ${currentEvent.answer.toUpperCase()}`;
+                    guessForm.style.display = "none";
+                    return;
+                }
+
                 // For game functionality, we assume that the API returns the answer and alternate answers.
                 correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
                 altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
@@ -125,6 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
             resultHeaderEl.textContent = "Game Over!";
             nameEntryDiv.classList.add("hidden");
         }
+
+        // Mark today's game as completed in localStorage
+        if (currentEvent && currentEvent.date) {
+            localStorage.setItem("played_" + currentEvent.date, "true");
+        }
+
         gameOverModal.classList.remove("hidden");
     }
 
@@ -310,4 +325,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Optionally, poll the leaderboard every 10 seconds to keep it updated in real time.
     setInterval(updateLeaderboard, 10000);
+
+    // Clear localStorage for testing (REMOVE IN PRODUCTION)
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "r" && e.ctrlKey) {
+            localStorage.clear();
+            location.reload();
+        }
+    });
 });

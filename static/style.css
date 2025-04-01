@@ -212,6 +212,11 @@ main {
     gap: 1rem;
 }
 
+.guess-form[style*="display: none"] {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
 .input-group {
     display: flex;
     gap: 0.5rem;
