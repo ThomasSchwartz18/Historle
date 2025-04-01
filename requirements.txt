@@ -2,3 +2,4 @@ Flask
 gunicorn
 flask-cors
 supabase
+better_profanity

@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const shareButton = document.getElementById("share-button");
 
     // ----------------------------------------------------------------
+    // Helper function to safely escape HTML content
+    // ----------------------------------------------------------------
+    function escapeHTML(str) {
+        const div = document.createElement("div");
+        div.textContent = str;
+        return div.innerHTML;
+    }
+
+    // ----------------------------------------------------------------
     // Fetch today's event from the API and initialize game state.
     // ----------------------------------------------------------------
     function fetchEvent() {
@@ -195,18 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (entry.x_profile) {
                         const anchor = document.createElement("a");
                         anchor.href = entry.x_profile;
-                        anchor.textContent = entry.name;
+                        anchor.innerHTML = escapeHTML(entry.name);
                         
                         // Create and append the x-logo image
                         const xLogoImg = document.createElement("img");
-                        xLogoImg.src = "/static/images/x-logo.svg";
+                        xLogoImg.src = "/static/images/x-logo.png";
                         xLogoImg.alt = "X Logo";
                         xLogoImg.className = "x-logo";
                         anchor.appendChild(xLogoImg);
                         
                         nameSpan.appendChild(anchor);
                     } else {
-                        nameSpan.textContent = entry.name;
+                        nameSpan.innerHTML = escapeHTML(entry.name);
                     }
                     entryDiv.appendChild(nameSpan);
 

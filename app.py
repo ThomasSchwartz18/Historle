@@ -2,6 +2,8 @@ import os
 from datetime import datetime, date, timezone
 from flask import Flask, render_template, jsonify, request, abort
 from flask_cors import CORS  # For secure cross-origin requests if needed
+import re
+from better_profanity import profanity
 
 # Import the Supabase client to securely interact with our database.
 from supabase import create_client, Client
@@ -17,6 +19,23 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 
 # Create a secure connection to the Supabase backend
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+profanity.load_censor_words()
+
+def is_valid_name(name: str) -> bool:
+    """Name shown on leaderboard. Must be safe, short, clean."""
+    return (
+        1 <= len(name) <= 20 and
+        re.match(r"^[a-zA-Z0-9 _.\-]+$", name) and
+        not profanity.contains_profanity(name)
+    )
+
+def is_valid_x_username(x_username: str) -> bool:
+    """Username is optional. Allows only Twitter-safe handles."""
+    return (
+        len(x_username) <= 30 and
+        (x_username == "" or re.match(r"^[a-zA-Z0-9_]+$", x_username))
+    )
 
 # ---------------------------
 # Utility Function: Fetch Today's Event from Supabase
@@ -123,9 +142,8 @@ def api_score():
     time_taken = data.get("time")
     clues_used = data.get("clues")
     
-    # Basic validation for expected fields
-    if not name or not isinstance(time_taken, str) or not isinstance(clues_used, int):
-        return jsonify({"error": "Missing or invalid fields"}), 400
+    if not is_valid_name(name) or not is_valid_x_username(x_username) or not isinstance(time_taken, str) or not isinstance(clues_used, int):
+        return jsonify({"error": "Invalid or unsafe data"}), 400
 
     # Limit input lengths for security
     if len(name) > 20:
