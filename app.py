@@ -94,7 +94,8 @@ def api_event():
         "summary": event.get("summary"),
         "date": event.get("date"),
         "answer": event.get("answer"),
-        "alt_answers": event.get("alt_answers")
+        "alt_answers": event.get("alt_answers"),
+        "category": event.get("category")
     }
     return jsonify(response)
 

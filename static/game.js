@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 remainingGuesses = 5;
                 updateClueDisplay();
                 // Display additional event info (year and difficulty)
-                document.getElementById("event-year").textContent = currentEvent.year || "????";
+                document.getElementById("event-year").textContent = currentEvent.category || "????";
                 document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
             })
             .catch(error => {
