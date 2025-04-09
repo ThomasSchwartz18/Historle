@@ -8,7 +8,22 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo1.png') }}">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Open Graph tags for social link previews -->
+  <meta property="og:title" content="Historle - Guess the moment. One clue at a time.">
+  <meta property="og:description" content="A daily historical guessing game where each clue brings you closer to the answer.">
+  <meta property="og:image" content="{{ url_for('static', filename='images/Link-Display.png', _external=True) }}">
+  <meta property="og:url" content="{{ request.url_root }}">
+  <meta property="og:type" content="website">
+
+  <!-- Twitter card tags (optional, but many platforms use them too) -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Historle - Guess the moment. One clue at a time.">
+  <meta name="twitter:description" content="A daily historical guessing game where each clue brings you closer to the answer.">
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/Link-Display.png', _external=True) }}">
+
 
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-MX21LJFB9Z"></script>
