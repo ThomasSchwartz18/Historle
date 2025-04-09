@@ -329,7 +329,12 @@ def register():
         supabase.table("users").insert(new_user).execute()
         session['username'] = username
         session.permanent = True
-        return jsonify({"success": True, "username": username})
+        return jsonify({
+            "success": True, 
+            "username": username,
+            "streak": 0,
+            "x_id": x_id
+        })
     except Exception as e:
         print("Registration failed:", str(e))
         return jsonify({"error": "Failed to register."}), 500

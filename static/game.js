@@ -563,7 +563,33 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("register-modal").classList.add("hidden");
             localStorage.setItem("username", data.username);
             userXId = data.x_id || "";
-            updateStreakDisplay(data.streak);
+
+            // Update streak container like in login:
+            const streakContainer = document.getElementById("streak-container");
+            if (streakContainer) {
+                streakContainer.innerHTML = '<p class="streak-display">🔥 Streak:</p>';
+                const streakCount = document.createElement("span");
+                streakCount.id = "streak-count-main";
+                streakCount.textContent = data.streak !== undefined ? data.streak : "0";
+                streakContainer.appendChild(streakCount);
+            }
+
+            // Hide the login button.
+            document.getElementById("login-btn").style.display = "none";
+            // Create a new logout button similar to the one created in your login handler.
+            const logoutBtn = document.createElement("a");
+            logoutBtn.href = "/logout";
+            logoutBtn.className = "navbar-link";
+            logoutBtn.id = "logout-btn";
+            logoutBtn.title = "Logout";
+            const img = document.createElement("img");
+            img.src = "/static/images/logout-icon.png";
+            img.alt = "logout";
+            img.className = "nav-icon logout-icon";
+            logoutBtn.appendChild(img);
+            document.querySelector(".navbar-links").appendChild(logoutBtn);
+
+            document.getElementById("user-greeting").textContent = `Hello, ${data.username}`;
         } else {
             const err = data.error?.toLowerCase() || "";
             if (err.includes("username")) {
