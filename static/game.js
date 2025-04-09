@@ -1,13 +1,15 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Global game state variables
+document.addEventListener("DOMContentLoaded", () => {
+    // **Global Game State Variables**
     let currentEvent = null;
     let currentClueIndex = 0;
     let remainingGuesses = 5;
+    // Do not assign the answer details from the event payload
     let correctAnswer = "";
-    let altAnswers = []; // Array of alternate valid answers
+    let altAnswers = [];
     let startTime = Date.now();
+    let userXId = null;
 
-    // DOM elements for updating UI
+    // **DOM Elements**
     const currentClueEl = document.getElementById("current-clue");
     const previousCluesEl = document.getElementById("previous-clues");
     const guessesLeftEl = document.getElementById("guesses-left");
@@ -19,426 +21,588 @@ document.addEventListener('DOMContentLoaded', () => {
     const correctAnswerEl = document.getElementById("correct-answer");
     const eventSummaryEl = document.getElementById("event-summary");
     const nameEntryDiv = document.getElementById("name-entry");
+    const nameInput = document.getElementById("player-name");
     const submitScoreBtn = document.getElementById("submit-score");
+    const leaderboardEl = document.getElementById("leaderboard-entries");
     const shareButton = document.getElementById("share-button");
+    const progressBarEl = document.getElementById("progress-bar");
 
-    // ----------------------------------------------------------------
-    // Helper function to safely escape HTML content
-    // ----------------------------------------------------------------
+    // Symbols for the share result grid
+    const BROWN_SQUARE = "·";
+    const GREY_SQUARE = "·";
+
+    // Helper: close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add("hidden");
+    }
+    // Expose closeModal globally for inline onclick handlers.
+    window.closeModal = closeModal;
+
+    // Helper: update win streak display.
+    function updateStreakDisplay(streak) {
+        const streakDisplay = document.getElementById("streak-count-main");
+        const storedUsername = localStorage.getItem("username");
+        if (!storedUsername) {
+            if (streakDisplay) {
+                streakDisplay.textContent = "Login to display win streak";
+            }
+        } else {
+            if (streakDisplay) {
+                streakDisplay.textContent = streak;
+            }
+        }
+    }
+
+    // Helper: update X profile link.
+    function updateXProfile(username, newXUsername) {
+        fetch("/api/update_x_profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: username, x_id: newXUsername })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast("X profile linked successfully!");
+                userXId = newXUsername;
+                const xUsernameInput = document.getElementById("x-username");
+                if (xUsernameInput) {
+                    xUsernameInput.style.display = "none";
+                }
+            } else {
+                showToast(data.error || "Failed to link X profile.", true);
+            }
+        })
+        .catch(err => showToast("Error linking X profile.", true));
+    }
+
+    // Helper: escape HTML entities.
     function escapeHTML(str) {
         const div = document.createElement("div");
         div.textContent = str;
         return div.innerHTML;
     }
 
-    // ----------------------------------------------------------------
-    // Fetch today's event from the API and initialize game state.
-    // ----------------------------------------------------------------
+    // Helper: display a toast message.
+    function showToast(message, isError = false) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = "toast show" + (isError ? " error" : "");
+        setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+
+    // Helper: display field error.
+    function showFieldError(fieldId, message) {
+        const oldError = document.querySelector(`#${fieldId} + .auth-error`);
+        if (oldError) oldError.remove();
+        const input = document.getElementById(fieldId);
+        const error = document.createElement("div");
+        error.className = "auth-error";
+        error.textContent = message;
+        input.insertAdjacentElement("afterend", error);
+    }
+
+    // Function to securely reveal the answer and summary.
+    function revealAnswerAndSummary() {
+        fetch("/api/reveal_answer", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ event_date: currentEvent.date })
+        })
+        .then(res => res.json())
+        .then(data => {
+            correctAnswerEl.textContent = `Answer: ${escapeHTML(data.answer.toUpperCase())}`;
+            eventSummaryEl.textContent = data.summary || "No summary available.";
+            correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
+            altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
+        })
+        .catch(err => {
+            correctAnswerEl.textContent = "Error revealing answer.";
+            console.error("Reveal failed:", err);
+        });
+    }
+
+    // Fetch today's event.
     function fetchEvent() {
-        fetch('/api/event')
+        fetch("/api/event")
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    currentClueEl.textContent = "Error loading event.";
+                    currentClueEl.innerHTML = "<span class='clue-text'>Error loading event.</span>";
                     return;
                 }
                 currentEvent = data;
-
-                // Check if player has already played today's event
-                const alreadyPlayed = localStorage.getItem("played_" + currentEvent.date);
-                if (alreadyPlayed) {
-                    currentClueEl.textContent = `You've already played today's event. Come back tomorrow! The answer was: ${currentEvent.answer.toUpperCase()}`;
-                    guessForm.style.display = "none";
-                    return;
+                const storedUsername = localStorage.getItem("username");
+                if (storedUsername) {
+                    // Check with backend if the user already played today.
+                    fetch("/api/already_played", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username: storedUsername })
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.already_played) {
+                            revealAnswerAndSummary();
+                            currentClueEl.innerHTML = `<span class='clue-text'>You've already played today's event. Come back tomorrow!</span>`;
+                            guessForm.style.display = "none";
+                        } else {
+                            // Reset local game state for a new game.
+                            currentClueIndex = 0;
+                            remainingGuesses = 5;
+                            startTime = Date.now();
+                            updateClueDisplay();
+                            updateProgressBar();
+                            document.getElementById("event-year").textContent = currentEvent.category || "History";
+                            document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
+                        }
+                    })
+                    .catch(err => {
+                        console.error("Error checking play status:", err);
+                        // Fallback: check localStorage
+                        const alreadyPlayed = localStorage.getItem("played_" + currentEvent.date);
+                        if (alreadyPlayed) {
+                            revealAnswerAndSummary();
+                            currentClueEl.innerHTML = `<span class='clue-text'>You've already played today's event. Come back tomorrow!</span>`;
+                            guessForm.style.display = "none";
+                        } else {
+                            currentClueIndex = 0;
+                            remainingGuesses = 5;
+                            startTime = Date.now();
+                            updateClueDisplay();
+                            updateProgressBar();
+                            document.getElementById("event-year").textContent = currentEvent.category || "History";
+                            document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
+                        }
+                    });
+                } else {
+                    // Non-logged-in users: fallback to localStorage.
+                    const alreadyPlayed = localStorage.getItem("played_" + currentEvent.date);
+                    if (alreadyPlayed) {
+                        revealAnswerAndSummary();
+                        currentClueEl.innerHTML = `<span class='clue-text'>You've already played today's event. Come back tomorrow!</span>`;
+                        guessForm.style.display = "none";
+                        return;
+                    }
+                    currentClueIndex = 0;
+                    remainingGuesses = 5;
+                    startTime = Date.now();
+                    updateClueDisplay();
+                    updateProgressBar();
+                    document.getElementById("event-year").textContent = currentEvent.category || "History";
+                    document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
                 }
-
-                // For game functionality, we assume that the API returns the answer and alternate answers.
-                correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
-                altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
-                // Initialize clue index and reset remaining guesses.
-                currentClueIndex = 0;
-                remainingGuesses = 5;
-                updateClueDisplay();
-                // Display additional event info (year and difficulty)
-                document.getElementById("event-year").textContent = currentEvent.category || "????";
-                document.getElementById("event-difficulty").textContent = currentEvent.difficulty || "Unknown";
             })
             .catch(error => {
                 console.error("Error fetching event:", error);
-                currentClueEl.textContent = "Error loading event.";
+                currentClueEl.innerHTML = "<span class='clue-text'>Error loading event.</span>";
             });
     }
 
-    // ----------------------------------------------------------------
-    // Update the displayed clue and remaining guesses.
-    // ----------------------------------------------------------------
+    // Update the current displayed clue.
     function updateClueDisplay() {
         if (currentEvent && currentEvent.clues && currentClueIndex < currentEvent.clues.length) {
-            currentClueEl.textContent = currentEvent.clues[currentClueIndex];
+            const newClueText = document.createElement("span");
+            newClueText.className = "clue-text";
+            newClueText.textContent = currentEvent.clues[currentClueIndex];
+            currentClueEl.innerHTML = "";
+            currentClueEl.appendChild(newClueText);
             guessesLeftEl.textContent = remainingGuesses;
         }
     }
 
-    // ----------------------------------------------------------------
-    // Handle dynamic day streak counter
-    // ----------------------------------------------------------------
-    function animateStreakChange(from, to) {
-        const mainEl = document.getElementById("streak-count-main");
-        const modalEl = document.getElementById("streak-count-modal");
-    
-        let current = from;
-        const increment = from < to ? 1 : -1;
-    
-        const interval = setInterval(() => {
-            current += increment;
-            if (mainEl) mainEl.textContent = current;
-            if (modalEl) modalEl.textContent = current;
-            if (current === to) clearInterval(interval);
-        }, 150);
-    }      
+    // Update the progress bar.
+    function updateProgressBar() {
+        const progress = (remainingGuesses / 5) * 100;
+        progressBarEl.style.width = `${progress}%`;
+    }
 
-    // ----------------------------------------------------------------
-    // Handle user's guess submission.
-    // ----------------------------------------------------------------
+    // Handle user's guess by sending it securely to the backend.
     function handleGuess(e) {
         e.preventDefault();
         const userGuess = guessInput.value.trim().toLowerCase();
         if (!userGuess) return;
-
-        // Check if the guess is correct against the answer or any alternate answer.
-        if (userGuess === correctAnswer || altAnswers.includes(userGuess)) {
-            finishGame(true);
-        } else {
-            // Move the current clue to previous clues with animation
-            if (currentClueIndex < currentEvent.clues.length) {
-                const prevClueText = currentEvent.clues[currentClueIndex];
-                const prevClueDiv = document.createElement("div");
-                prevClueDiv.className = "clue pop-in";
-                prevClueDiv.textContent = prevClueText;
-                previousCluesEl.appendChild(prevClueDiv);
-            }
-
-            // Move to next clue and decrement remaining guesses.
-            currentClueIndex++;
-            remainingGuesses--;
-            if (remainingGuesses <= 0 || currentClueIndex >= currentEvent.clues.length) {
-                finishGame(false);
+        fetch("/api/guess", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                guess: userGuess,
+                event_date: currentEvent.date
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.correct) {
+                finishGame(true);
             } else {
-                updateClueDisplay();
+                // Show the previous clue and update game state.
+                if (currentClueIndex < currentEvent.clues.length) {
+                    const prevClueText = currentEvent.clues[currentClueIndex];
+                    const prevClueDiv = document.createElement("div");
+                    prevClueDiv.className = "clue fade-in";
+                    prevClueDiv.textContent = prevClueText;
+                    previousCluesEl.appendChild(prevClueDiv);
+                    setTimeout(() => prevClueDiv.classList.remove("fade-in"), 500);
+                }
+                currentClueIndex++;
+                remainingGuesses--;
+                updateProgressBar();
+                if (remainingGuesses <= 0 || currentClueIndex >= currentEvent.clues.length) {
+                    finishGame(false);
+                } else {
+                    updateClueDisplay();
+                }
             }
-        }
-        // Clear the input field.
+        })
+        .catch(err => {
+            console.error("Guess check failed:", err);
+            alert("Something went wrong. Try again.");
+        });
         guessInput.value = "";
     }
 
-    // ----------------------------------------------------------------
-    // Finish the game: display the appropriate modal for win or loss.
-    // ----------------------------------------------------------------
+    // Conclude the game: either on a correct guess or after running out of clues/guesses.
     function finishGame(success) {
-        // Stop further submissions.
         guessForm.removeEventListener("submit", handleGuess);
-        const timeTaken = Math.floor((Date.now() - startTime) / 1000); // time in seconds
-    
-        // Fill modal with event details.
-        correctAnswerEl.textContent = `Answer: ${correctAnswer.toUpperCase()}`;
-        eventSummaryEl.textContent = currentEvent.summary || "";
-    
-        // Get the previous streak before changing anything
-        const priorStreak = parseInt(localStorage.getItem("historle_streak") || "0", 10);
-        let newStreak = 0;
-    
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        localStorage.setItem("played_" + currentEvent.date, "true");
+        // Securely fetch and reveal the answer.
+        revealAnswerAndSummary();
+        const storedUsername = localStorage.getItem("username");
         if (success) {
-            resultHeaderEl.textContent = "Congratulations! You guessed correctly!";
-            nameEntryDiv.classList.remove("hidden");
-            submitScoreBtn.addEventListener("click", submitScore);
-    
-            // Store the win and update streak
-            if (currentEvent && currentEvent.date) {
-                const today = currentEvent.date;
-                let wins = JSON.parse(localStorage.getItem("historle_wins") || "[]");
-    
-                // Avoid duplicates
-                if (!wins.includes(today)) {
-                    wins.push(today);
-                    localStorage.setItem("historle_wins", JSON.stringify(wins));
+            if (storedUsername) {
+                nameInput.value = storedUsername;
+                submitScoreAutomatically(timeTaken, true);
+                if (!userXId || userXId === "") {
+                    const xUsernameInput = document.getElementById("x-username");
+                    if (xUsernameInput) {
+                        xUsernameInput.style.display = "block";
+                        xUsernameInput.addEventListener("change", function() {
+                            const newXUsername = this.value.trim();
+                            if (newXUsername !== "") {
+                                updateXProfile(storedUsername, newXUsername);
+                            }
+                        });
+                    }
+                } else {
+                    document.getElementById("x-username").style.display = "none";
                 }
-    
-                newStreak = calculateStreak(wins);
-                localStorage.setItem("historle_streak", newStreak);
-                animateStreakChange(priorStreak, newStreak);
+                nameEntryDiv.classList.add("hidden");
+            } else {
+                nameEntryDiv.classList.remove("hidden");
+                nameEntryDiv.innerHTML = "<p>Please create an account or log in to join the leaderboard and track your win streaks!</p>" + nameEntryDiv.innerHTML;
+                submitScoreBtn.addEventListener("click", submitScore, { once: true });
             }
+            resultHeaderEl.textContent = "Congratulations! You guessed correctly!";
         } else {
             resultHeaderEl.textContent = "Game Over!";
             nameEntryDiv.classList.add("hidden");
-    
-            // Reset streak on loss
-            localStorage.setItem("historle_streak", 0);
-            animateStreakChange(priorStreak, 0);
+            if (storedUsername) {
+                submitScoreAutomatically(timeTaken, false);
+            }
         }
-    
-        // Mark today's game as completed in localStorage
-        if (currentEvent && currentEvent.date) {
-            localStorage.setItem("played_" + currentEvent.date, "true");
-        }
-    
         gameOverModal.classList.remove("hidden");
-    }    
-
-    // ----------------------------------------------------------------
-    // Update and display the current streak
-    // ----------------------------------------------------------------
-    function calculateStreak(winDates) {
-        const sorted = winDates.sort();
-        let streak = 0;
-        let currentDate = new Date();
-    
-        for (let i = sorted.length - 1; i >= 0; i--) {
-            const date = new Date(sorted[i]);
-            const daysAgo = Math.floor((currentDate - date) / (1000 * 60 * 60 * 24));
-            if (daysAgo === streak) {
-                streak++;
-            } else {
-                break;
-            }
-        }
-        return streak;
-    }    
-
-    // ----------------------------------------------------------------
-    // Submit player's score to the leaderboard via the API.
-    // ----------------------------------------------------------------
-    function submitScore() {
-        const playerName = document.getElementById("player-name").value.trim();
-        const xUsername = document.getElementById("x-username").value.trim();
-        if (!playerName) {
-            alert("Please enter your name for the leaderboard.");
-            return;
-        }
-        const duration = Date.now() - startTime;
-        const hours = Math.floor(duration / 3600000);
-        const minutes = Math.floor((duration % 3600000) / 60000);
-        const seconds = Math.floor((duration % 60000) / 1000);
-        const centiseconds = Math.floor((duration % 1000) / 10);
-
-        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centiseconds).padStart(2, '0')}`;
-
-        // Number of clues used is (currentClueIndex + 1)
-        const cluesUsed = currentClueIndex + 1;
-        const scoreData = {
-            name: playerName,
-            x_username: xUsername,
-            time: formattedTime,
-            clues: cluesUsed
-        };
-
-        fetch('/api/score', {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(scoreData)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                alert("Error submitting score. Please try again.");
-            } else {
-                // Instead of alerting, simply remove the input section from the game-over popup.
-                nameEntryDiv.classList.add("hidden");
-                // Update the leaderboard display in real time.
-                updateLeaderboard();
-            }
-        })
-        .catch(error => {
-            console.error("Error submitting score:", error);
-            alert("Error submitting score. Please try again.");
-        });
+        updateLeaderboard();
     }
 
-    // ----------------------------------------------------------------
-    // Update the leaderboard by fetching the top 10 entries from the API.
-    // ----------------------------------------------------------------
+    // Automatically submit score (win or loss) for logged-in users.
+    function submitScoreAutomatically(timeTaken, win) {
+        const payload = {
+            username: localStorage.getItem("username"),
+            solve_time: `${Math.floor(timeTaken / 60).toString().padStart(2, '0')}:${(timeTaken % 60).toString().padStart(2, '0')}`,
+            clues_used: currentClueIndex + 1,
+            event_date: currentEvent.date,
+            win: win
+        };
+        if (userXId && userXId !== "") {
+            payload.x_profile = `https://x.com/${userXId}`;
+        }
+        fetch("/api/submit_score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast(`Score submitted! · Streak: ${data.streak}`);
+                updateStreakDisplay(data.streak);
+            } else {
+                showToast(data.error || "Failed to submit score.", true);
+            }
+        })
+        .catch(err => showToast("Error submitting score.", true));
+    }
+
+    // Submit score using manual (non-automatic) submission.
+    function submitScore() {
+        const name = nameInput.value.trim();
+        if (!name) return alert("Please enter your name.");
+        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const cluesUsed = currentClueIndex + 1;
+        const payload = {
+            username: name,
+            solve_time: timeTaken,
+            clues_used: cluesUsed,
+            event_date: currentEvent.date,
+            win: true
+        };
+        if (userXId && userXId !== "") {
+            payload.x_profile = `https://x.com/${userXId}`;
+        }
+        fetch("/api/submit_score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast("Score submitted successfully!");
+                nameEntryDiv.classList.add("hidden");
+                updateLeaderboard();
+                updateStreakDisplay(data.streak);
+            } else {
+                showToast("Error submitting score.", true);
+            }
+        })
+        .catch(err => showToast("Error submitting score.", true));
+    }
+
+    // Refresh leaderboard entries.
     function updateLeaderboard() {
         fetch('/api/leaderboard')
             .then(response => response.json())
             .then(data => {
                 const leaderboardEntriesEl = document.getElementById("leaderboard-entries");
-                leaderboardEntriesEl.innerHTML = ""; // Clear existing entries
+                leaderboardEntriesEl.innerHTML = "";
                 data.forEach((entry, index) => {
                     const entryDiv = document.createElement("div");
                     entryDiv.className = "leaderboard-entry";
-
-                    // Rank
                     const rankSpan = document.createElement("span");
                     rankSpan.className = "rank";
                     rankSpan.textContent = index + 1;
                     entryDiv.appendChild(rankSpan);
-
-                    // Name with optional X profile link and x-logo if linked
                     const nameSpan = document.createElement("span");
                     nameSpan.className = "name";
                     if (entry.x_profile) {
                         const anchor = document.createElement("a");
                         anchor.href = entry.x_profile;
                         anchor.innerHTML = escapeHTML(entry.name);
-                        
-                        // Create and append the x-logo image
                         const xLogoImg = document.createElement("img");
                         xLogoImg.src = "/static/images/x-logo.png";
                         xLogoImg.alt = "X Logo";
                         xLogoImg.className = "x-logo";
                         anchor.appendChild(xLogoImg);
-                        
                         nameSpan.appendChild(anchor);
                     } else {
                         nameSpan.innerHTML = escapeHTML(entry.name);
                     }
                     entryDiv.appendChild(nameSpan);
-
-                    // Solve time
                     const timeSpan = document.createElement("span");
                     timeSpan.className = "time";
                     timeSpan.textContent = entry.solve_time;
                     entryDiv.appendChild(timeSpan);
-
-                    // Clues used
                     const cluesSpan = document.createElement("span");
                     cluesSpan.className = "clues";
                     cluesSpan.textContent = entry.clues_used;
                     entryDiv.appendChild(cluesSpan);
-
                     leaderboardEntriesEl.appendChild(entryDiv);
                 });
             })
             .catch(err => console.error("Error updating leaderboard:", err));
     }
 
-    // ----------------------------------------------------------------
-    // Handle Countdown Timer
-    // ----------------------------------------------------------------
+    // Countdown timer for the next event.
     function startCountdown() {
-        const countdownHours = document.getElementById("countdown-hours");
-        const countdownMinutes = document.getElementById("countdown-minutes");
-        const countdownSeconds = document.getElementById("countdown-seconds");
-    
-        function updateCountdown() {
+        function updateTimer() {
             const now = new Date();
-    
-            // Calculate the next UTC midnight
-            const nextUtcMidnight = new Date(Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate() + 1, // next day
-                0, 0, 0
-            ));
-    
-            const diff = nextUtcMidnight - now;
-    
-            if (diff <= 0) {
-                countdownHours.textContent = "00";
-                countdownMinutes.textContent = "00";
-                countdownSeconds.textContent = "00";
-
-                location.reload();
-                return;
+            const tomorrow = new Date(now);
+            tomorrow.setUTCDate(now.getUTCDate() + 1);
+            tomorrow.setUTCHours(0, 0, 0, 0);
+            const timeLeft = tomorrow - now;
+            if (timeLeft <= 0) {
+                document.getElementById("countdown-hours").textContent = "00";
+                document.getElementById("countdown-minutes").textContent = "00";
+                document.getElementById("countdown-seconds").textContent = "00";
+                fetchEvent();
+            } else {
+                const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                document.getElementById("countdown-hours").textContent = `${hours}`;
+                document.getElementById("countdown-minutes").textContent = `${minutes}`;
+                document.getElementById("countdown-seconds").textContent = `${seconds}`;
             }
-    
-            const totalSeconds = Math.floor(diff / 1000);
-            const hours = Math.floor(totalSeconds / 3600);
-            const minutes = Math.floor((totalSeconds % 3600) / 60);
-            const seconds = totalSeconds % 60;
-    
-            countdownHours.textContent = String(hours).padStart(2, "0");
-            countdownMinutes.textContent = String(minutes).padStart(2, "0");
-            countdownSeconds.textContent = String(seconds).padStart(2, "0");
         }
-    
-        updateCountdown(); // Update immediately
-        setInterval(updateCountdown, 1000); // Update every second
+        updateTimer();
+        setInterval(updateTimer, 1000);
     }
-     
 
-    // ----------------------------------------------------------------
-    // Handle share button click: copy share message to clipboard.
-    // ----------------------------------------------------------------
+    // Share the game result.
     function handleShare() {
-        const shareMessage = `I just played Historle! ${resultHeaderEl.textContent} My time: ${Math.floor((Date.now() - startTime)/1000)} seconds. Check it out!`;
-        if (navigator.clipboard) {
+        if (!currentEvent) return;
+        const totalGuesses = 5;
+        const cluesUsed = currentClueIndex;
+        const brownCount = totalGuesses - cluesUsed;
+        const greyCount = cluesUsed;
+        const guessLine = BROWN_SQUARE.repeat(brownCount) + GREY_SQUARE.repeat(greyCount);
+        const shareMessage = `My Historle guesses:\n${guessLine}\nGive it a try: www.historle.com`;
+        if (navigator.share) {
+            navigator.share({
+                title: "Historle Result",
+                text: shareMessage,
+                url: "https://www.historle.com"
+            }).catch(err => console.error("Error sharing:", err));
+        } else if (navigator.clipboard) {
             navigator.clipboard.writeText(shareMessage)
-                .then(() => console.log("Result copied to clipboard!"))
+                .then(() => alert("Result copied to clipboard!"))
                 .catch(err => console.error("Failed to copy result.", err));
         } else {
-            console.log(shareMessage);
+            alert(shareMessage);
         }
     }
 
-    // Event listeners
+    // Event listeners for UI interactions.
     modalCloseBtn.addEventListener("click", () => {
         gameOverModal.classList.add("hidden");
     });
     shareButton.addEventListener("click", handleShare);
     guessForm.addEventListener("submit", handleGuess);
 
-    // Debug button reveal on Shift + D
-    document.addEventListener("keydown", (e) => {
-        if (e.shiftKey && e.key.toLowerCase() === "d") {
-            const debugBtn = document.getElementById("debug-btn");
-            if (debugBtn) debugBtn.style.display = "block";
-        }
+    // Login and Register modal event bindings.
+    document.getElementById("login-btn").addEventListener("click", (e) => {
+        e.preventDefault();
+        document.getElementById("login-modal").classList.remove("hidden");
     });
+    // document.getElementById("register-btn").addEventListener("click", (e) => {
+    //     e.preventDefault();
+    //     document.getElementById("register-modal").classList.remove("hidden");
+    // });
 
-    // Debug functionality
-    const debugBtn = document.getElementById("debug-btn");
-    if (debugBtn) {
-        debugBtn.addEventListener("click", () => {
-            const today = currentEvent?.date;
-            const wins = JSON.parse(localStorage.getItem("historle_wins") || "[]");
-            const hasPlayedToday = localStorage.getItem("played_" + today) !== null;
-            const streak = localStorage.getItem("historle_streak") || "0";
-
-            console.log("🧪 Debug Info:");
-            console.log("Wins:", wins);
-            console.log("Current Streak:", streak);
-            console.log("Played today:", hasPlayedToday);
-
-            const confirmReset = confirm("Reset streak and today's play flag?");
-            if (confirmReset) {
-                localStorage.removeItem("historle_streak");
-                localStorage.removeItem("played_" + today);
-                localStorage.setItem("historle_wins", JSON.stringify(wins.filter(d => d !== today)));
-                alert("Streak and today's play flag have been reset.");
-                location.reload();
-            }
+    // Attach event listener to the "Login to Track" link in the streak section.
+    const streakLogin = document.getElementById("streak-login");
+    if (streakLogin) {
+        streakLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            document.getElementById("login-modal").classList.remove("hidden");
         });
     }
 
-    // Fetch the event and leaderboard immediately on page load
+    // New: Attach event listener to the register button within the login modal.
+    const loginRegisterBtn = document.getElementById("login-register-btn");
+    if (loginRegisterBtn) {
+        loginRegisterBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            // Close the login modal.
+            closeModal("login-modal");
+            // Open the register modal.
+            document.getElementById("register-modal").classList.remove("hidden");
+        });
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("login-username").value;
+        const password = document.getElementById("login-password").value;
+        const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast("Login successful!");
+            document.getElementById("login-modal").classList.add("hidden");
+            document.getElementById("login-btn").style.display = "none";
+            // document.getElementById("register-btn").style.display = "none";
+            const logoutBtn = document.createElement("a");
+            logoutBtn.href = "/logout";
+            logoutBtn.className = "navbar-link";
+            logoutBtn.id = "logout-btn";
+            logoutBtn.title = "Logout";
+            const img = document.createElement("img");
+            img.src = "/static/images/logout-icon.png";
+            img.alt = "logout";
+            img.className = "nav-icon logout-icon";
+            logoutBtn.appendChild(img);
+            document.querySelector(".navbar-links").appendChild(logoutBtn);
+            logoutBtn.addEventListener("click", (e) => {
+                document.getElementById("user-greeting").textContent = "";
+            });
+            localStorage.setItem("username", data.username);
+            userXId = data.x_id || "";
+            // Update the greeting.
+            document.getElementById("user-greeting").textContent = `Hello, ${data.username}`;
+            // Update the streak section to show the streak count instead of the login link.
+            const streakContainer = document.getElementById("streak-container");
+            if (streakContainer) {
+                streakContainer.innerHTML = '<p class="streak-display">🔥 Streak:</p>';
+                const streakCount = document.createElement("span");
+                streakCount.id = "streak-count-main";
+                streakCount.textContent = data.streak !== undefined ? data.streak : "0";
+                streakContainer.appendChild(streakCount);
+            }
+        } else {
+            showFieldError("login-username", data.error || "Login failed.");
+        }
+    });
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const username = document.getElementById("reg-username").value;
+        const password = document.getElementById("reg-password").value;
+        const x_id = document.getElementById("reg-xid").value;
+        const res = await fetch("/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username, password, x_id })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast("Registration successful!");
+            document.getElementById("register-modal").classList.add("hidden");
+            localStorage.setItem("username", data.username);
+            userXId = data.x_id || "";
+            updateStreakDisplay(data.streak);
+        } else {
+            const err = data.error?.toLowerCase() || "";
+            if (err.includes("username")) {
+                showFieldError("reg-username", data.error);
+            } else if (err.includes("password")) {
+                showFieldError("reg-password", data.error);
+            } else {
+                showToast("Something went wrong.", true);
+            }
+        }
+    });
+
+    // Initialize game, countdown, and leaderboard.
     fetchEvent();
-    updateLeaderboard();
     startCountdown();
-
-    // Initialize streak display
-    const winDates = JSON.parse(localStorage.getItem("historle_wins") || "[]");
-    const streakMain = document.getElementById("streak-count-main");
-    const streakModal = document.getElementById("streak-count-modal");
-    const currentStreak = calculateStreak(winDates);
-    if (streakMain) streakMain.textContent = currentStreak;
-    if (streakModal) streakModal.textContent = currentStreak;
-
-    // Optionally, poll the leaderboard every 10 seconds to keep it updated in real time.
+    updateLeaderboard();
     setInterval(updateLeaderboard, 10000);
 
-    // Clear localStorage for testing (REMOVE IN PRODUCTION)
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "r" && e.ctrlKey) {
-            localStorage.clear();
-            location.reload();
+    // Debug button to clear the played flag.
+    const debugBtn = document.getElementById("debug-btn");
+    debugBtn.addEventListener("click", () => {
+        console.log("Clearing today's localStorage flag so you can replay.");
+        if (currentEvent && currentEvent.date) {
+            const key = "played_" + currentEvent.date;
+            localStorage.removeItem(key);
+            console.log(`Removed localStorage key: ${key}`);
+            alert("Local progress reset. Refresh the page to test again.");
+        } else {
+            console.warn("No currentEvent loaded yet.");
+            alert("Event not loaded · try again after the game is fully loaded.");
         }
-        // Reset streak for testing (REMOVE IN PRODUCTION)
-        if (e.ctrlKey && e.key === "Backspace") {
-            localStorage.removeItem("historle_wins");
-            localStorage.removeItem("historle_streak");
-            location.reload();
+    });
+    document.addEventListener("keydown", (e) => {
+        console.log("Key pressed:", e.key, "Shift:", e.shiftKey);
+        if (e.shiftKey && e.key.toLowerCase() === "d") {
+            const debugBtn = document.getElementById("debug-btn");
+            if (debugBtn) {
+                debugBtn.style.display = debugBtn.style.display === "none" ? "block" : "none";
+            }
         }
     });
 });

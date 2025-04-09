@@ -3,3 +3,8 @@ gunicorn
 flask-cors
 supabase
 better_profanity
+flask_cors
+flask-limiter
+python-dotenv
+httpx
+asyncio

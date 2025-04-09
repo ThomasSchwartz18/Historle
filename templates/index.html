@@ -1,158 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Historle - Guess the moment. One clue at a time.</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo1.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historle - Guess the moment. One clue at a time.</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo1.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
 
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-MX21LJFB9Z"></script>
-    <script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MX21LJFB9Z"></script>
+  <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
 
         gtag('config', 'G-MX21LJFB9Z');
-    </script>
+  </script>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="header-container">
-                <div class="header-content">
-                    <div class="header-title">
-                        <div class="logo-container">
-                            <img src="{{ url_for('static', filename='images/floating-img-1.png') }}" alt="Floating Image 1" class="floating-img floating-img-1">
-                            <img src="{{ url_for('static', filename='images/floating-img-2.png') }}" alt="Floating Image 2" class="floating-img floating-img-2">
-                            <img src="{{ url_for('static', filename='images/floating-img-3.png') }}" alt="Floating Image 3" class="floating-img floating-img-3">
-                            <img src="{{ url_for('static', filename='images/floating-img-4.png') }}" alt="Floating Image 4" class="floating-img floating-img-4">
-                            <img src="{{ url_for('static', filename='images/web-logo.png') }}" alt="Historle Logo" class="header-logo">
-                        </div>
-                    </div>
-                    <p class="tagline">Guess the moment. One clue at a time.</p>
-                    <p class="tagline">Guess quickly and display your name on the leaderboard!</p>
-                </div>
-            </div>
-        </header>        
-
-        <main>
-            <div class="game-section">
-                <div class="game-container">
-                    <!-- <p class="streak-display">🔥 Current Streak: <span id="streak-count-main">0</span> days</p> -->
-                    <div class="difficulty-display" aria-label="Event Difficulty">
-                        Difficulty: <span id="event-difficulty">Loading difficulty...</span>
-                    </div>
-                    <div class="year-display" aria-label="Event Year">
-                        Category: <b><span id="event-year">????</span></b>
-                    </div>
-
-                    <div class="clues-container">
-                        <div class="clue current-clue" id="current-clue" aria-live="polite">
-                            Loading clue...
-                        </div>
-                        <div class="previous-clues" id="previous-clues"></div>
-                    </div>
-
-                    <form id="guess-form" class="guess-form">
-                        <div class="input-group">
-                            <input type="text" 
-                                   id="guess-input" 
-                                   placeholder="Enter your guess..." 
-                                   aria-label="Enter your guess"
-                                   autocomplete="off"
-                                   required>
-                            <button type="submit" aria-label="Submit guess">Submit</button>
-                        </div>
-                        <div class="clues-remaining">
-                            Remaining guesses: <span id="guesses-left">4</span>
-                        </div>
-                    </form>
-                </div>
-
-                <div id="leaderboard" class="leaderboard">
-                    <h2>Today's Top 10:</h2>
-                    <div class="leaderboard-header">
-                        <span class="rank">Rank</span>
-                        <span class="name">Name</span>
-                        <span class="time">Time</span>
-                        <span class="clues">Clues</span>
-                    </div>
-                    <div id="leaderboard-entries" class="leaderboard-entries">
-                        <!-- Leaderboard entries will be inserted here -->
-                    </div>
-                </div>
-            </div>
-        </main>
-
-        <footer>
-            <p>A daily historical event guessing game</p>
-            <div class="countdown-container">
-                <p>Next historical moment in:</p>
-                <div class="countdown" id="countdown">
-                    <div class="countdown-item">
-                        <span id="countdown-hours">--</span>
-                        <span class="countdown-label">hours</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="countdown-minutes">--</span>
-                        <span class="countdown-label">minutes</span>
-                    </div>
-                    <div class="countdown-item">
-                        <span id="countdown-seconds">--</span>
-                        <span class="countdown-label">seconds</span>
-                    </div>
-                </div>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Game Over Modal -->
-    <div id="game-over" class="modal hidden">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <button class="modal-close" id="modal-close" aria-label="Close">×</button>
-            <div class="result-container">
-                <h2 id="result-header"></h2>
-                <!-- <p class="streak-display">🔥 Current Streak: <span id="streak-count-modal">0</span> days</p> -->
-                <p id="correct-answer"></p>
-                <div class="summary" id="event-summary"></div>
-                
-                <div class="name-entry hidden" id="name-entry">
-                    <p>Congratulations! Enter your name for the leaderboard:</p>
-                    <div class="input-group">
-                        <input type="text" 
-                               id="player-name" 
-                               placeholder="Your name to display on the leaderboard" 
-                               maxlength="20"
-                               aria-label="Enter your name">
-                    </div>
-                    <p>Optional: Enter your X username to allow others to find you from the leaderboard!</p>
-                    <div class="input-group">
-                        <input type="text" 
-                               id="x-username" 
-                               placeholder="Your X username (optional)" 
-                               maxlength="30"
-                               aria-label="Enter your X username">
-                    </div>
-                    <button id="submit-score" aria-label="Submit score">Submit Score</button>
-                </div>
-                
-                <button id="share-button" class="share-button">
-                    Share Result
-                </button>
-                <p class="return-tomorrow">Come back tomorrow for a new historical moment!</p>
-            </div>
+  <div class="container">
+    <header>
+      <nav class="navbar">
+        <div id="user-greeting"></div>
+        <div class="navbar-links">
+          <!-- <a href="#" id="prev-days-btn" class="navbar-link" title="View Previous Prompts">
+            <img src="{{ url_for('static', filename='images/history-icon.png')}}" alt="previous prompts" class="nav-icon history-icon">
+          </a> -->
+          {% if not session.logged_in %}
+          <a href="#" id="login-btn" class="navbar-link" title="Login">
+            <img src="{{ url_for('static', filename='images/login-icon.png')}}" alt="login" class="nav-icon login-icon">
+          </a>
+          <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
+            <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
+          </a> -->
+          {% else %}
+          <a href="/logout" class="navbar-link" title="Logout">
+            <img src="{{ url_for('static', filename='images/logout-icon.png')}}" alt="logout" class="nav-icon logout-icon">
+          </a>
+          {% endif %}
         </div>
+      </nav>
+      <div class="header-text">
+        <div class="navbar-logo">
+          <img src="{{ url_for('static', filename='images/floating-img-1.png') }}" alt="Floating Image 1" class="floating-img floating-img-1">
+          <img src="{{ url_for('static', filename='images/floating-img-2.png') }}" alt="Floating Image 2" class="floating-img floating-img-2">
+          <img src="{{ url_for('static', filename='images/floating-img-3.png') }}" alt="Floating Image 3" class="floating-img floating-img-3">
+          <img src="{{ url_for('static', filename='images/floating-img-4.png') }}" alt="Floating Image 4" class="floating-img floating-img-4">
+          <a href="/">
+            <img src="{{ url_for('static', filename='images/web-logo.png') }}" alt="Historle Logo" class="header-logo">
+          </a>
+          <!-- New element to display the win streak (only visible for logged-in users) -->
+          <div class="streak-section">
+            <div class="streak-container" id="streak-container">
+              <p class="streak-display">🔥 Streak:</p>
+              {% if not session.logged_in %}
+              <a href="#" id="streak-login" class="login-link" title="Login">
+                <span>Login to Track</span>
+              </a>
+              {% else %}
+              <span id="streak-count-main">{{ user_streak or 0 }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- <p class="tagline">Guess the moment. One clue at a time.</p> -->
+      </div>
+    </header>
+    <main>
+      <div class="game-section">
+        <div class="game-container">
+          <div class="year-display" aria-label="Event Year">
+            Category: <b><span id="event-year">????</span></b>
+          </div>
+          <div class="game-box">
+            <div class="clues-container">
+              <p>hints:</p>
+              <div class="clue current-clue" id="current-clue" aria-live="polite">Loading clue...</div>
+              <div class="previous-clues" id="previous-clues"></div>
+            </div>
+            <form id="guess-form" class="guess-form">
+              <div class="input-wrapper">
+                <input type="text" id="guess-input" placeholder="Take a guess..." aria-label="Enter your guess" autocomplete="off" required>
+                <button type="submit" aria-label="Submit guess" class="submit-inside">
+                  <span class="arrow-icon">⏎</span>
+                </button>
+              </div>
+              <p class="clues-remaining">Remaining guesses: <span id="guesses-left">5</span></p>
+            </form>          
+            <div class="progress-container">
+              <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div class="difficulty-display" aria-label="Event Difficulty">
+              Today's Difficulty: <span id="event-difficulty">Loading difficulty...</span>
+            </div>
+          </div>
+        </div>
+        <div id="leaderboard" class="leaderboard">
+          <h2>Today's Top 10:</h2>
+          <div class="leaderboard-header">
+              <span class="rank">Rank</span>
+              <span class="name">Name</span>
+              <span class="time">Time</span>
+              <span class="clues">Clues</span>
+          </div>
+          <div id="leaderboard-entries" class="leaderboard-entries">
+              <!-- Leaderboard entries will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <p>A daily historical event guessing game</p>
+      <div class="countdown-container">
+        <p>Next historical moment in:</p>
+        <div class="countdown" id="countdown">
+          <div class="countdown-item">
+            <span id="countdown-hours">--</span>
+            <span class="countdown-label">hours</span>
+          </div>
+          <div class="countdown-item">
+            <span id="countdown-minutes">--</span>
+            <span class="countdown-label">minutes</span>
+          </div>
+          <div class="countdown-item">
+            <span id="countdown-seconds">--</span>
+            <span class="countdown-label">seconds</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+  <div id="game-over" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close" aria-label="Close">x</button>
+      <div class="result-container">
+        <h2 id="result-header"></h2>
+        <p id="correct-answer"></p>
+        <div class="summary" id="event-summary"></div>
+        <div class="name-entry hidden" id="name-entry">
+          <p>Congratulations! Enter your name for the leaderboard:</p>
+          <div class="input-group">
+            <input type="text" id="player-name" placeholder="Your name" maxlength="20" aria-label="Enter your name">
+          </div>
+          <p>Optional: Enter your X username:</p>
+          <div class="input-group">
+            <input type="text" id="x-username" placeholder="Your X username (optional)" maxlength="30" aria-label="Enter your X username">
+          </div>
+          <button id="submit-score" aria-label="Submit score">Submit Score</button>
+        </div>
+        <button id="share-button" class="share-button">Share Result</button>
+        <p class="return-tomorrow">Come back tomorrow for a new historical moment!</p>
+      </div>
     </div>
+  </div>
 
-    <script src="{{ url_for('static', filename='game.js') }}"></script>
-    <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
-        🧪 Debug
-    </button> -->
+  <!-- Login Modal -->
+  <div id="login-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('login-modal')">x</button>
+      <h2>Login</h2>
+      <form id="login-form" class="auth-form">
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" required>
+
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required>
+
+        <button type="submit">Login</button>
+        <p style="width: 100%; text-align: center;">or</p>
+        <a href="#" id="login-register-btn" class="navbar-link" title="Register">
+          Register
+        </a>
+      </form>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div id="register-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('register-modal')">x</button>
+      <h2>Register - it's free!</h2>
+      <p>Benefits:</p>
+      <ul>
+        <li>Track win streaks</li>
+        <li>Compete for leaderboard spots</li>
+        <li>Link X account to leaderboard</li>
+      </ul>
+      <form id="register-form" class="auth-form">
+        <label for="reg-username">Username</label>
+        <input type="text" id="reg-username" required>
+
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" required>
+
+        <label for="reg-xid">X Username (optional)</label>
+        <input type="text" id="reg-xid">
+
+        <button type="submit">Register</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
+    Debug
+  </button> -->
+  <script src="{{ url_for('static', filename='game.js') }}"></script>
+  <div id="toast" class="toast hidden"></div>
 </body>
-</html> 
+</html>
