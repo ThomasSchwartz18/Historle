@@ -45,8 +45,8 @@
             <img src="{{ url_for('static', filename='images/history-icon.png')}}" alt="previous prompts" class="nav-icon history-icon">
           </a> -->
           {% if not session.logged_in %}
-          <a href="#" id="login-btn" class="navbar-link" title="Login">
-            <img src="{{ url_for('static', filename='images/login-icon.png')}}" alt="login" class="nav-icon login-icon">
+          <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
+            <p>Login / Register</p>
           </a>
           <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
             <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
@@ -76,7 +76,7 @@
                 <span>Login to Track</span>
               </a>
               {% else %}
-              <span id="streak-count-main">{{ user_streak or 0 }}</span>
+              <span id="streak-count-main"><b>{{ user_streak or 0 }}</b></span>
               {% endif %}
             </div>
           </div>

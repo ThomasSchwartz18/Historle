@@ -85,6 +85,33 @@
     animation: wiggle 0.4s ease-in-out;
   }
 
+  .login-register-navbar-button {
+    position: relative;
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    padding: 5px 14px;
+    border-radius: 50px;
+    background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
+    transition: box-shadow 0.3s ease;
+}
+
+.login-register-navbar-button::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    right: 1px;
+    bottom: 1px;
+    background: white; /* or whatever your background color is */
+    border-radius: 50px;
+    z-index: -1;
+}
+
+.login-register-navbar-button:hover {
+    box-shadow: 0 0 15px rgba(255, 186, 107, 0.8),
+                0 0 25px rgba(135, 94, 0, 0.6);
+}
+
   @keyframes wiggle {
     0% { transform: rotate(0deg); }
     25% { transform: rotate(10deg); }
@@ -335,7 +362,7 @@
   .progress-bar {
     width: 100%;
     height: 100%;
-    background-color: var(--accent-color);
+    background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
     border-radius: 4px;
     transition: width 0.5s ease;
   }

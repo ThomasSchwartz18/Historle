@@ -28,8 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const progressBarEl = document.getElementById("progress-bar");
 
     // Symbols for the share result grid
-    const BROWN_SQUARE = "·";
-    const GREY_SQUARE = "·";
+    const BROWN_SQUARE = "🟫";
+    const GREY_SQUARE = "⬜";
 
     // Helper: close modal
     function closeModal(modalId) {
