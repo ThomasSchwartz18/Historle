@@ -186,12 +186,14 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('register-modal')">x</button>
       <h2>Register - it's free!</h2>
-      <p>Benefits:</p>
-      <ul>
-        <li>Track win streaks</li>
-        <li>Compete for leaderboard spots</li>
-        <li>Link X account to leaderboard</li>
-      </ul>
+      <i>
+        <p>Benefits:</p>
+        <ul>
+          <li>Track win streaks</li>
+          <li>Compete for leaderboard spots</li>
+          <li>Link X account to leaderboard</li>
+        </ul>
+      </i>
       <form id="register-form" class="auth-form">
         <label for="reg-username">Username</label>
         <input type="text" id="reg-username" required>
@@ -207,9 +209,9 @@
     </div>
   </div>
 
-  <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
+  <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
     Debug
-  </button> -->
+  </button>
   <script src="{{ url_for('static', filename='game.js') }}"></script>
   <div id="toast" class="toast hidden"></div>
 </body>
