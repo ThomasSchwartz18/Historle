@@ -139,6 +139,7 @@ def api_leaderboard():
         result = supabase.table("leaderboard") \
                          .select("*") \
                          .eq("date", today_str) \
+                         .lte("clues_used", 5) \
                          .order("solve_time", desc=False) \
                          .order("clues_used", desc=False) \
                          .limit(10) \
