@@ -31,6 +31,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const BROWN_SQUARE = "🟫";
     const GREY_SQUARE = "⬜";
 
+    // Define formatUsername in the global scope of DOMContentLoaded
+    function formatUsername(username) {
+        return username.includes('@') ? username.split('@')[0] : username;
+    }
+
     // Helper: close modal
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add("hidden");
@@ -388,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (entry.x_profile) {
                         const anchor = document.createElement("a");
                         anchor.href = entry.x_profile;
-                        anchor.innerHTML = escapeHTML(entry.name);
+                        anchor.innerHTML = escapeHTML(formatUsername(entry.name));
                         const xLogoImg = document.createElement("img");
                         xLogoImg.src = "/static/images/x-logo.png";
                         xLogoImg.alt = "X Logo";
@@ -396,7 +401,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         anchor.appendChild(xLogoImg);
                         nameSpan.appendChild(anchor);
                     } else {
-                        nameSpan.innerHTML = escapeHTML(entry.name);
+                        let displayName = entry.name;
+                        if (displayName.includes('@')) {
+                        displayName = displayName.split('@')[0];
+                        }
+                        nameSpan.innerHTML = escapeHTML(displayName);
                     }
                     entryDiv.appendChild(nameSpan);
                     const timeSpan = document.createElement("span");
@@ -533,7 +542,8 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("username", data.username);
             userXId = data.x_id || "";
             // Update the greeting.
-            document.getElementById("user-greeting").textContent = `Hello, ${data.username}`;
+            // Helper function: return the substring before '@', if present.
+            document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
             // Update the streak section to show the streak count instead of the login link.
             const streakContainer = document.getElementById("streak-container");
             if (streakContainer) {
@@ -588,8 +598,11 @@ document.addEventListener("DOMContentLoaded", () => {
             img.className = "nav-icon logout-icon";
             logoutBtn.appendChild(img);
             document.querySelector(".navbar-links").appendChild(logoutBtn);
+            function formatUsername(username) {
+                return username.includes('@') ? username.split('@')[0] : username;
+            }
 
-            document.getElementById("user-greeting").textContent = `Hello, ${data.username}`;
+            document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
         } else {
             const err = data.error?.toLowerCase() || "";
             if (err.includes("username")) {
