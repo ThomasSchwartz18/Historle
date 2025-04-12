@@ -76,7 +76,7 @@ def get_current_game_date():
     tz = pytz.timezone("America/New_York")
     now = datetime.now(tz)
     # Define the 8pm cutoff
-    cutoff = now.replace(hour=20, minute=0, second=0, microsecond=0)
+    cutoff = now.replace(hour=0, minute=0, second=0, microsecond=0)
     if now < cutoff:
         # If before 8pm, the game day is still yesterday's event.
         game_date = (now - timedelta(days=1)).strftime("%Y-%m-%d")
