@@ -97,6 +97,17 @@ def me():
         return jsonify({"username": session.get("username")})
     else:
         return jsonify({"username": None}), 401
+    
+@app.route("/api/user_stats", methods=["GET"])
+def user_stats():
+    if "username" in session:
+        result = supabase.table("users").select("*").eq("username", session.get("username")).single().execute()
+        user_data = result.data
+        if user_data:
+            return jsonify({
+                "streak": user_data.get("streak", 0)
+            })
+    return jsonify({"error": "Not authenticated"}), 401
 
 @app.route("/api/reveal_answer", methods=["POST"])
 def reveal_answer():

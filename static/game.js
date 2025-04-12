@@ -59,19 +59,51 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function checkSession() {
-        fetch("/api/me", {
-            credentials: 'include'
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.username) {
-                localStorage.setItem("username", data.username);
-                document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
-                // Optionally update other UI elements, like streak container, if you have that logic.
-            }
-        })
-        .catch(err => console.error("Error checking session:", err));
-    }    
+        fetch("/api/me", { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.username) {
+                    localStorage.setItem("username", data.username);
+                    document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
+                    // After that, fetch additional stats.
+                    fetch("/api/user_stats", { credentials: 'include' })
+                        .then(response => response.json())
+                        .then(stats => {
+                            const streakContainer = document.getElementById("streak-container");
+                            if (streakContainer) {
+                                streakContainer.innerHTML = '<p class="streak-display">🔥 Streak:</p>';
+                                const streakCount = document.createElement("span");
+                                streakCount.id = "streak-count-main";
+                                streakCount.textContent = stats.streak !== undefined ? stats.streak : "0";
+                                streakContainer.appendChild(streakCount);
+                            }
+                        })
+                        .catch(err => console.error("Error fetching user stats:", err));
+                    // Update navbar: hide login button and add logout button if needed.
+                    const loginBtn = document.getElementById("login-btn");
+                    if (loginBtn) {
+                        loginBtn.style.display = "none";
+                    }
+                    if (!document.getElementById("logout-btn")) {
+                        const logoutBtn = document.createElement("a");
+                        logoutBtn.href = "/logout";
+                        logoutBtn.className = "navbar-link";
+                        logoutBtn.id = "logout-btn";
+                        logoutBtn.title = "Logout";
+                        const img = document.createElement("img");
+                        img.src = "/static/images/logout-icon.png";
+                        img.alt = "logout";
+                        img.className = "nav-icon logout-icon";
+                        logoutBtn.appendChild(img);
+                        document.querySelector(".navbar-links").appendChild(logoutBtn);
+                        logoutBtn.addEventListener("click", (e) => {
+                            document.getElementById("user-greeting").textContent = "";
+                        });
+                    }
+                }
+            })
+            .catch(err => console.error("Error checking session:", err));
+    }     
 
     // Helper: update X profile link.
     function updateXProfile(username, newXUsername) {
