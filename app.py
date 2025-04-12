@@ -11,7 +11,10 @@ from flask_limiter.util import get_remote_address
 
 # Initialize Flask app and set a permanent session lifetime (30 days)
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", os.urandom(24))
+# Set the fixed secret key from your environment variables
+app.secret_key = os.environ.get("SECRET_KEY")
+if not app.secret_key:
+    raise Exception("A fixed SECRET_KEY must be set in the environment!")
 app.permanent_session_lifetime = timedelta(days=30)
 CORS(app)
 
