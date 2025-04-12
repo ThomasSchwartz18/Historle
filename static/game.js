@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Helper: update X profile link.
     function updateXProfile(username, newXUsername) {
         fetch("/api/update_x_profile", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: username, x_id: newXUsername })
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to securely reveal the answer and summary.
     function revealAnswerAndSummary() {
         fetch("/api/reveal_answer", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ event_date: currentEvent.date })
@@ -129,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Fetch today's event.
     function fetchEvent() {
-        fetch("/api/event")
+        fetch("/api/event", {credentials: 'include',})
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
@@ -141,6 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (storedUsername) {
                     // Check with backend if the user already played today.
                     fetch("/api/already_played", {
+                        credentials: 'include',
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ username: storedUsername })
@@ -228,6 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const userGuess = guessInput.value.trim().toLowerCase();
         if (!userGuess) return;
         fetch("/api/guess", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -323,6 +327,7 @@ document.addEventListener("DOMContentLoaded", () => {
             payload.x_profile = `https://x.com/${userXId}`;
         }
         fetch("/api/submit_score", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -356,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
             payload.x_profile = `https://x.com/${userXId}`;
         }
         fetch("/api/submit_score", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload)
@@ -376,7 +382,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Refresh leaderboard entries.
     function updateLeaderboard() {
-        fetch('/api/leaderboard')
+        fetch('/api/leaderboard', {credentials: 'include',})
             .then(response => response.json())
             .then(data => {
                 const leaderboardEntriesEl = document.getElementById("leaderboard-entries");
@@ -515,6 +521,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const username = document.getElementById("login-username").value;
         const password = document.getElementById("login-password").value;
         const res = await fetch("/api/login", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password })
@@ -563,6 +570,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById("reg-password").value;
         const x_id = document.getElementById("reg-xid").value;
         const res = await fetch("/api/register", {
+            credentials: 'include',
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username, password, x_id })

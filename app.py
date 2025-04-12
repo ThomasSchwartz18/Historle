@@ -16,7 +16,7 @@ app.secret_key = os.environ.get("SECRET_KEY")
 if not app.secret_key:
     raise Exception("A fixed SECRET_KEY must be set in the environment!")
 app.permanent_session_lifetime = timedelta(days=30)
-CORS(app)
+CORS(app, supports_credentials=True)
 
 limiter = Limiter(get_remote_address, app=app, default_limits=[])
 
