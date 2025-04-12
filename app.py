@@ -8,6 +8,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import pytz
 
 # Initialize Flask app and set a permanent session lifetime (30 days)
 app = Flask(__name__)
@@ -68,6 +69,20 @@ def get_event_for_today():
     except Exception as e:
         print("Error fetching event from Supabase:", e)
         return None
+
+# Date for current game
+def get_current_game_date():
+    # Use 'America/New_York' to properly account for Eastern Time and DST.
+    tz = pytz.timezone("America/New_York")
+    now = datetime.now(tz)
+    # Define the 8pm cutoff
+    cutoff = now.replace(hour=20, minute=0, second=0, microsecond=0)
+    if now < cutoff:
+        # If before 8pm, the game day is still yesterday's event.
+        game_date = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+    else:
+        game_date = now.strftime("%Y-%m-%d")
+    return game_date
 
 @app.route("/")
 def index():
@@ -155,7 +170,7 @@ def check_guess():
 @app.route("/api/leaderboard", methods=["GET"])
 def api_leaderboard():
     """API endpoint to retrieve the top 10 leaderboard entries for today."""
-    today_str = date.today().strftime("%Y-%m-%d")
+    today_str = get_current_game_date()
     try:
         result = supabase.table("leaderboard") \
                          .select("*") \
@@ -258,20 +273,25 @@ def submit_score():
         longest_win_streak = user_data.get("longest_win_streak") or 0
         today = datetime.strptime(event_date, "%Y-%m-%d").date()
         days_played += 1
+        current_game_day = get_current_game_date()  # e.g., "2025-04-12" using the 8:00pm cutoff logic
+        current_game_date_obj = datetime.strptime(current_game_day, "%Y-%m-%d").date()
+        
         if win:
             total_wins += 1
             last_win = user_data.get("last_win_date")
             if last_win:
                 last_win_date = datetime.fromisoformat(last_win).date()
-                if (today - last_win_date).days == 1:
+                day_difference = (current_game_date_obj - last_win_date).days
+                if day_difference == 1:
                     current_streak += 1
-                elif (today - last_win_date).days != 0:
+                elif day_difference > 1:
                     current_streak = 1
+                # If day_difference == 0, it's the same game day, so no change.
             else:
                 current_streak = 1
             if current_streak > longest_win_streak:
                 longest_win_streak = current_streak
-            new_last_win_date = today.isoformat()
+            new_last_win_date = current_game_day  # store as a string in "YYYY-MM-DD" format
         else:
             total_losses += 1
             current_streak = 0
@@ -284,7 +304,7 @@ def submit_score():
             "total_losses": total_losses,
             "longest_win_streak": longest_win_streak,
             "last_win_date": new_last_win_date,
-            "last_played_date": today.isoformat()
+            "last_played_date": current_game_day
         }).eq("username", username).execute()
         return jsonify({
             "success": True,
@@ -314,7 +334,7 @@ def already_played():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    today_str = date.today().strftime("%Y-%m-%d")
+    today_str = get_current_game_date()
     already_played = (user.get("last_played_date") == today_str)
     return jsonify({"already_played": already_played})
 
