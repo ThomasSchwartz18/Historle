@@ -478,16 +478,23 @@ document.addEventListener("DOMContentLoaded", () => {
     // Countdown timer for the next event.
     function startCountdown() {
         function updateTimer() {
-            const now = new Date();
-            const tomorrow = new Date(now);
-            tomorrow.setUTCDate(now.getUTCDate() + 1);
-            tomorrow.setUTCHours(0, 0, 0, 0);
-            const timeLeft = tomorrow - now;
+            // Get current time in Eastern Time
+            const nowEastern = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+            
+            // Create a new Date for the upcoming midnight Eastern
+            let tomorrowEastern = new Date(nowEastern);
+            tomorrowEastern.setDate(nowEastern.getDate() + 1);
+            tomorrowEastern.setHours(0, 0, 0, 0);
+            
+            // Compute the difference in milliseconds
+            const timeLeft = tomorrowEastern - nowEastern;
+            
+            // If timeLeft is less than or equal to 0, display zeros and re-fetch event data
             if (timeLeft <= 0) {
                 document.getElementById("countdown-hours").textContent = "00";
                 document.getElementById("countdown-minutes").textContent = "00";
                 document.getElementById("countdown-seconds").textContent = "00";
-                fetchEvent();
+                fetchEvent();  // Refresh the event at midnight Eastern.
             } else {
                 const hours = Math.floor(timeLeft / (1000 * 60 * 60));
                 const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -499,7 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         updateTimer();
         setInterval(updateTimer, 1000);
-    }
+    }    
 
     // Share the game result.
     function handleShare() {
