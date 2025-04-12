@@ -91,6 +91,13 @@ def api_event():
     }
     return jsonify(response)
 
+@app.route("/api/me", methods=["GET"])
+def me():
+    if "username" in session:
+        return jsonify({"username": session.get("username")})
+    else:
+        return jsonify({"username": None}), 401
+
 @app.route("/api/reveal_answer", methods=["POST"])
 def reveal_answer():
     """

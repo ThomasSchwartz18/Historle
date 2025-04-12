@@ -58,6 +58,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function checkSession() {
+        fetch("/api/me", {
+            credentials: 'include'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.username) {
+                localStorage.setItem("username", data.username);
+                document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
+                // Optionally update other UI elements, like streak container, if you have that logic.
+            }
+        })
+        .catch(err => console.error("Error checking session:", err));
+    }    
+
     // Helper: update X profile link.
     function updateXProfile(username, newXUsername) {
         fetch("/api/update_x_profile", {
@@ -622,6 +637,10 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
+
+    // Call checkSession as the first step, then proceed with initializing the game.
+    checkSession();
 
     // Initialize game, countdown, and leaderboard.
     fetchEvent();
