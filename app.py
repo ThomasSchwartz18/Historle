@@ -50,7 +50,7 @@ def get_event_for_today():
     Query the Supabase daily_events table for the event matching today's date.
     Converts 'alt_answers' and 'clues' from semicolon-separated strings into lists.
     """
-    today_str = date.today().strftime("%Y-%m-%d")
+    today_str = get_current_game_date()
     try:
         result = supabase.table("daily_events") \
                          .select("*") \
@@ -134,7 +134,7 @@ def reveal_answer():
     event_date = data.get("event_date")
     if not event_date:
         return jsonify({"error": "Missing event date"}), 400
-    today_str = date.today().strftime("%Y-%m-%d")
+    today_str = get_current_game_date()
     if event_date != today_str:
         return jsonify({"error": "Invalid date"}), 403
     event = get_event_for_today()
