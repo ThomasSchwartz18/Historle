@@ -98,6 +98,38 @@ document.addEventListener("DOMContentLoaded", () => {
                         document.querySelector(".navbar-links").appendChild(logoutBtn);
                         logoutBtn.addEventListener("click", (e) => {
                             document.getElementById("user-greeting").textContent = "";
+                            // Remove the stats button on logout:
+                            const statsBtn = document.getElementById("stats-btn");
+                            if (statsBtn) {
+                                statsBtn.remove();
+                            }
+                        });
+                    }
+                    if (!document.getElementById("stats-btn")) {
+                        const statsBtn = document.createElement("a");
+                        statsBtn.href = "#";  // Use a hash so it doesn’t trigger navigation.
+                        statsBtn.className = "navbar-link";
+                        statsBtn.id = "stats-btn";
+                        statsBtn.title = "View Stats";
+                        
+                        const statsImg = document.createElement("img");
+                        statsImg.src = "/static/images/stats.png"; // Ensure stats.png is in your static/images folder.
+                        statsImg.alt = "stats";
+                        statsImg.className = "nav-icon";
+                        
+                        statsBtn.appendChild(statsImg);
+                        // Insert the stats button before the logout button.
+                        const logoutBtn = document.getElementById("logout-btn");
+                        if (logoutBtn) {
+                            logoutBtn.parentNode.insertBefore(statsBtn, logoutBtn);
+                        } else {
+                            document.querySelector(".navbar-links").appendChild(statsBtn);
+                        }
+                        
+                        // Attach click event to open the stats modal.
+                        statsBtn.addEventListener("click", (e) => {
+                            e.preventDefault();
+                            openStatsModal();
                         });
                     }
                 }
@@ -508,6 +540,29 @@ document.addEventListener("DOMContentLoaded", () => {
         setInterval(updateTimer, 1000);
     }    
 
+    // Handle stats modal
+    function openStatsModal() {
+        fetch("/api/user_full_stats", { credentials: 'include' })
+          .then(response => response.json())
+          .then(data => {
+              if (data.error) {
+                  showToast("Error fetching stats", true);
+              } else {
+                  document.getElementById("stats-current-streak").textContent = data.streak;
+                  document.getElementById("stats-total-wins").textContent = data.total_wins;
+                  document.getElementById("stats-days-played").textContent = data.days_played;
+                  document.getElementById("stats-win-percentage").textContent = data.win_percentage + "%";
+                  document.getElementById("stats-longest-streak").textContent = data.longest_win_streak;
+                  // Open the modal by removing the 'hidden' class.
+                  document.getElementById("stats-modal").classList.remove("hidden");
+              }
+          })
+          .catch(err => {
+              console.error("Error fetching stats:", err);
+              showToast("Error fetching stats", true);
+          });
+    }    
+
     // Share the game result.
     function handleShare() {
         if (!currentEvent) return;
@@ -614,6 +669,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 streakCount.textContent = data.streak !== undefined ? data.streak : "0";
                 streakContainer.appendChild(streakCount);
             }
+
+            checkSession();
         } else {
             showFieldError("login-username", data.error || "Login failed.");
         }

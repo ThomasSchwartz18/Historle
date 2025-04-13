@@ -227,6 +227,22 @@
     </div>
   </div>
 
+  <!-- Stats Modal -->
+  <div id="stats-modal" class="modal hidden">
+    <div class="modal-overlay" onclick="closeModal('stats-modal')"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('stats-modal')">&times;</button>
+      <h2>Your Stats</h2>
+      <div class="stats-section">
+        <p class="stats-block">Current Win Streak: <span id="stats-current-streak">0</span></p>
+        <p class="stats-block">Total Wins: <span id="stats-total-wins">0</span></p>
+        <p class="stats-block">Total Days Played: <span id="stats-days-played">0</span></p>
+        <p class="stats-block">Win %: <span id="stats-win-percentage">0%</span></p>
+        <p class="stats-block">Longest Win Streak: <span id="stats-longest-streak">0</span></p>
+      </div>
+    </div>
+  </div>  
+
   <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
     Debug
   </button> -->

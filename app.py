@@ -383,6 +383,31 @@ def logout():
     session.clear()
     return redirect(url_for('index'))
 
+# Track all user stats
+@app.route("/api/user_full_stats", methods=["GET"])
+def user_full_stats():
+    if "username" in session:
+        result = supabase.table("users") \
+                         .select("*") \
+                         .eq("username", session.get("username")) \
+                         .single() \
+                         .execute()
+        user_data = result.data
+        if user_data:
+            days_played = user_data.get("days_played") or 0
+            total_wins = user_data.get("total_wins") or 0
+            win_percentage = 0
+            if days_played > 0:
+                win_percentage = round((total_wins / days_played) * 100, 2)
+            return jsonify({
+                "streak": user_data.get("streak", 0),
+                "total_wins": total_wins,
+                "days_played": days_played,
+                "win_percentage": win_percentage,
+                "longest_win_streak": user_data.get("longest_win_streak", 0)
+            })
+    return jsonify({"error": "Not authenticated"}), 401
+
 if __name__ == "__main__":
     # In production, debug should be disabled for security reasons.
     app.run(host='0.0.0.0', port=5002, debug=False)
