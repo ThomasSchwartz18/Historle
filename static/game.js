@@ -371,7 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
             win: win
         };
         if (userXId && userXId !== "") {
-            payload.x_profile = `https://x.com/${userXId}`;
+            payload.x_id = userXId;
         }
         fetch("/api/submit_score", {
             credentials: 'include',
@@ -405,7 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
             win: true
         };
         if (userXId && userXId !== "") {
-            payload.x_profile = `https://x.com/${userXId}`;
+            payload.x_id = `userXId`;
         }
         fetch("/api/submit_score", {
             credentials: 'include',
@@ -443,9 +443,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     entryDiv.appendChild(rankSpan);
                     const nameSpan = document.createElement("span");
                     nameSpan.className = "name";
-                    if (entry.x_profile) {
+                    if (entry.x_id) {
                         const anchor = document.createElement("a");
-                        anchor.href = entry.x_profile;
+                        anchor.href = `https://x.com/${entry.x_id}`;
                         anchor.innerHTML = escapeHTML(formatUsername(entry.name));
                         const xLogoImg = document.createElement("img");
                         xLogoImg.src = "/static/images/x-logo.png";
@@ -456,10 +456,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     } else {
                         let displayName = entry.name;
                         if (displayName.includes('@')) {
-                        displayName = displayName.split('@')[0];
+                            displayName = displayName.split('@')[0];
                         }
                         nameSpan.innerHTML = escapeHTML(displayName);
-                    }
+                    }                                 
                     entryDiv.appendChild(nameSpan);
                     const timeSpan = document.createElement("span");
                     timeSpan.className = "time";

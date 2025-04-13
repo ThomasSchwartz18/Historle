@@ -186,42 +186,6 @@ def api_leaderboard():
         print("Leaderboard fetch error:", e)
         return jsonify({"error": "Failed to fetch leaderboard data"}), 500
 
-@app.route("/api/score", methods=["POST"])
-def api_score():
-    """
-    API endpoint to submit a player's score.
-    Expects a JSON payload with name, x_username (optional), time, and clues.
-    """
-    today_str = date.today().strftime("%Y-%m-%d")
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "Invalid data"}), 400
-    name = data.get("name", "").strip()
-    x_username = data.get("x_username", "").strip()
-    time_taken = data.get("time")
-    clues_used = data.get("clues")
-    if not is_valid_name(name) or not is_valid_x_username(x_username) or not isinstance(time_taken, str) or not isinstance(clues_used, int):
-        return jsonify({"error": "Invalid or unsafe data"}), 400
-    if len(name) > 20:
-        name = name[:20]
-    if len(x_username) > 30:
-        x_username = x_username[:30]
-    x_profile = f"https://x.com/{x_username}" if x_username else ""
-    score_entry = {
-        "name": name,
-        "x_profile": x_profile,
-        "solve_time": time_taken,
-        "clues_used": clues_used,
-        "date": today_str,
-        "timestamp": datetime.now(timezone.utc).isoformat()
-    }
-    try:
-        result = supabase.table("leaderboard").insert(score_entry).execute()
-        return jsonify({"success": True, "entry": result.data}), 201
-    except Exception as e:
-        print("Score submission error:", e)
-        return jsonify({"error": "Failed to submit score"}), 500
-
 @app.route("/api/submit_score", methods=["POST"])
 def submit_score():
     """
@@ -252,8 +216,16 @@ def submit_score():
         "date": event_date,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
-    if "x_profile" in data and data["x_profile"]:
-        score_entry["x_profile"] = data["x_profile"]
+    # Store the user's X ID in the leaderboard entry.
+    # First, check if the client sent an x_id in the request.
+    if "x_id" in data and data["x_id"].strip():
+        score_entry["x_id"] = data["x_id"].strip()
+    else:
+        # Otherwise, retrieve the x_id from the user's record.
+        result = supabase.table("users").select("x_id").eq("username", username).single().execute()
+        user_info = result.data
+        if user_info and user_info.get("x_id"):
+            score_entry["x_id"] = user_info.get("x_id")
     try:
         supabase.table("leaderboard").insert(score_entry).execute()
     except Exception as e:
