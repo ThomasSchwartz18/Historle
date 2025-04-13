@@ -791,34 +791,63 @@
     margin-top: -0.5rem;
   }  
   
-  .stats-section {
-    background-color: #fff;               /* White background for clarity */
-    padding: 1.5rem;                      /* Adequate padding around the content */
-    border-radius: 8px;                   /* Rounded corners for a modern look */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);  /* Subtle shadow for depth */
-    margin: 1rem 0;                       /* Spacing from other modal elements */
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    font-family: 'Open Sans', sans-serif; /* Consistent typography */
-  }
-  
-  .stats-block {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem 1rem;                /* Internal spacing */
-    background: #f9f9f9;                  /* Light background to differentiate */
-    border: 1px solid #ddd;               /* Soft border */
-    border-radius: 5px;                   /* Rounded corners on each block */
-    font-size: 1rem;
-    color: #333;                        /* Dark text for readability */
-  }
-  
-  .stats-block span {
-    font-weight: 700;                     /* Bold out the dynamic values */
-    color: #e67e22;                       /* Accent color to draw attention (orange tone) */
-  }  
+/* Base styling for the stats modal section */
+.stats-section {
+  background-color: var(--modal-bg-color, #fff);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: "Open Sans", sans-serif;
+  transition: transform 0.3s ease;
+}
+.stats-section:hover {
+  transform: scale(1.02);
+}
+
+/* Each stats block styling */
+.stats-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--stats-bg, #f9f9f9);
+  border: 1px solid var(--stats-border, #ddd);
+  border-radius: 5px;
+  font-size: 1rem;
+  color: var(--stats-text, #333);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Style for the dynamic value inside each block */
+.stats-block span {
+  font-weight: 700;
+  color: var(--stats-value-color, #e67e22);
+  transition: color 0.3s ease;
+}
+
+/* Flash animation for when a stat updates.
+   Add the "update" class to a .stats-block element in your JS when its value changes */
+@keyframes flash-update {
+  0% { background-color: var(--stats-bg, #f9f9f9); }
+  50% { background-color: #fff3c4; }
+  100% { background-color: var(--stats-bg, #f9f9f9); }
+}
+.stats-block.update {
+  animation: flash-update 1s ease-in-out;
+}
+
+/* Example threshold-based dynamic styling.
+   You could update the data-type attribute (e.g., "good" or "bad") via JavaScript based on the stat value */
+.stats-block[data-type="good"] span {
+  color: #27ae60; /* green */
+}
+.stats-block[data-type="bad"] span {
+  color: #c0392b; /* red */
+}
 
   /* Animations */
   @keyframes fadeIn {
