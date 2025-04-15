@@ -891,6 +891,28 @@
   transform: translate(-50%, 0);
 }
 
+.donation-section {
+  margin-top: 1.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.donation-container {
+  max-width: 600px;
+}
+
+.donation-container p {
+  margin-top: 0.5rem;
+}
+
+.donate-button {
+  margin-top: 1rem;
+}
+
   /* Animations */
   @keyframes fadeIn {
     from { opacity: 0; }
