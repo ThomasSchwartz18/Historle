@@ -870,6 +870,27 @@
   color: #c0392b; /* red */
 }
 
+/* Updated Bookmark Banner Styling */
+.bookmark-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translate(-50%, -100%);  /* Start off-screen */
+  transition: transform 0.5s ease;
+  background-color: var(--accent-color);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 0 0 8px 8px;
+  z-index: 10000;
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* When visible, slide down into view */
+.bookmark-banner.visible {
+  transform: translate(-50%, 0);
+}
+
   /* Animations */
   @keyframes fadeIn {
     from { opacity: 0; }

@@ -58,6 +58,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Function to show the bookmark banner with a slide-down effect
+    function showBookmarkBanner() {
+        const banner = document.getElementById("bookmark-banner");
+        if (banner) {
+            // Slide the banner down
+            banner.classList.add("visible");
+            // After 2 seconds, slide the banner up
+            setTimeout(() => {
+                banner.classList.remove("visible");
+            }, 2000);
+        }
+    }
+
     function checkSession() {
         fetch("/api/me", { credentials: 'include' })
             .then(response => response.json())
@@ -785,6 +798,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Call checkSession as the first step, then proceed with initializing the game.
     checkSession();
+    showBookmarkBanner();
 
     // Initialize game, countdown, and leaderboard.
     fetchEvent();
