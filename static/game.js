@@ -137,6 +137,54 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch(err => console.error("Error checking session:", err));
     }     
 
+    // Function to update the streak leaderboard display.
+    function updateStreakLeaderboard() {
+        fetch('/api/streak_leaderboard', { credentials: 'include' })
+            .then(response => response.json())
+            .then(data => {
+                const streakLeaderboardEl = document.getElementById("streak-leaderboard-entries");
+                if (!streakLeaderboardEl) {
+                    console.error("Element #streak-leaderboard-entries not found.");
+                    return;
+                }
+                streakLeaderboardEl.innerHTML = ""; // Clear any existing data.
+
+                data.forEach((entry, index) => {
+                    const entryDiv = document.createElement("div");
+                    entryDiv.className = "leaderboard-entry"; // Reuse existing leaderboard styling.
+
+                    // Rank
+                    const rankSpan = document.createElement("span");
+                    rankSpan.className = "rank";
+                    rankSpan.textContent = index + 1;
+                    entryDiv.appendChild(rankSpan);
+
+                    // Username with optional X profile link.
+                    const nameSpan = document.createElement("span");
+                    nameSpan.className = "name";
+                    if (entry.x_id) {
+                        const anchor = document.createElement("a");
+                        anchor.href = `https://x.com/${entry.x_id}`;
+                        anchor.innerHTML = escapeHTML(formatUsername(entry.username));
+                        nameSpan.appendChild(anchor);
+                    } else {
+                        nameSpan.textContent = escapeHTML(formatUsername(entry.username));
+                    }
+                    entryDiv.appendChild(nameSpan);
+
+                    // Display the streak value.
+                    const streakSpan = document.createElement("span");
+                    streakSpan.className = "streak";
+                    streakSpan.textContent = "🔥 " + entry.streak;
+                    entryDiv.appendChild(streakSpan);
+
+                    streakLeaderboardEl.appendChild(entryDiv);
+                });
+            })
+            .catch(err => console.error("Error updating streak leaderboard:", err));
+    }
+
+
     // Helper: update X profile link.
     function updateXProfile(username, newXUsername) {
         fetch("/api/update_x_profile", {
@@ -743,6 +791,9 @@ document.addEventListener("DOMContentLoaded", () => {
     startCountdown();
     updateLeaderboard();
     setInterval(updateLeaderboard, 10000);
+    // Initialize streak leaderboard.
+    updateStreakLeaderboard();
+    setInterval(updateStreakLeaderboard, 10000);
 
     // Debug button to clear the played flag.
     const debugBtn = document.getElementById("debug-btn");

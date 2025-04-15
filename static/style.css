@@ -464,6 +464,13 @@
   }
   
 /* Leaderboard Styles */
+.leaderboards-container {
+  display: flex;
+  gap: 2rem; /* Adjust gap as needed */
+  justify-content: center;
+  flex-wrap: wrap; /* Optional: Allows wrapping on smaller screens */
+}
+
 .leaderboard {
   background: white;
   padding: 1.5rem;
@@ -471,6 +478,10 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   width: 100%;
   margin: 3rem auto 0rem auto;
+}
+
+.leaderboard-streak {
+  max-width: 200px;
 }
 
 .leaderboard h2 {
@@ -492,6 +503,9 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
+.streak-header {
+  grid-template-columns: 0.5fr 2fr 1fr; /* 3 columns: Rank, Name, Streak */
+}
 
 /* Entry Styling */
 .leaderboard-entry {
@@ -505,6 +519,13 @@
 
 .leaderboard-entry:last-child {
   border-bottom: none; /* Remove border from the last entry */
+}
+
+.leaderboard-entry .streak {
+  text-align: end;
+  display: flex;
+  justify-content: end;
+  align-items: end;
 }
 
 /* Styling for individual columns */

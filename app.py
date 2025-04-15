@@ -408,6 +408,25 @@ def user_full_stats():
             })
     return jsonify({"error": "Not authenticated"}), 401
 
+# Route for the top streak leaders
+@app.route("/api/streak_leaderboard", methods=["GET"])
+def streak_leaderboard():
+    """
+    API endpoint to retrieve the top 5 users with the highest current streaks.
+    This queries the users table and sorts by the streak column in descending order.
+    """
+    try:
+        result = supabase.table("users") \
+                         .select("username, streak, x_id") \
+                         .order("streak", desc=True) \
+                         .limit(5) \
+                         .execute()
+        streak_data = result.data
+        return jsonify(streak_data)
+    except Exception as e:
+        print("Error fetching streak leaderboard:", e)
+        return jsonify({"error": "Failed to fetch streak leaderboard"}), 500
+
 if __name__ == "__main__":
     # In production, debug should be disabled for security reasons.
     app.run(host='0.0.0.0', port=5002, debug=False)
