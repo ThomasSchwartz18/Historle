@@ -98,6 +98,16 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Event listener for the "Play game" button to close the auth modal
+    const playGameBtn = document.getElementById("play-game");
+    if (playGameBtn) {
+        playGameBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal("auth-modal");
+            // Optionally, you might also perform additional actions like starting the game
+        });
+    }
+
     function checkSession() {
         fetch("/api/me", { credentials: 'include' })
             .then(response => response.json())
