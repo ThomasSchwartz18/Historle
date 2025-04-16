@@ -108,33 +108,33 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    if (!document.getElementById("settings-btn")) {
-        const settingsBtn = document.createElement("a");
-        settingsBtn.href = "#";
-        settingsBtn.className = "navbar-link";
-        settingsBtn.id = "settings-btn";
-        settingsBtn.title = "Settings";
+    // if (!document.getElementById("settings-btn")) {
+    //     const settingsBtn = document.createElement("a");
+    //     settingsBtn.href = "#";
+    //     settingsBtn.className = "navbar-link";
+    //     settingsBtn.id = "settings-btn";
+    //     settingsBtn.title = "Settings";
         
-        const img = document.createElement("img");
-        img.src = "/static/images/settings.png";
-        img.alt = "settings";
-        img.className = "nav-icon";
-        settingsBtn.appendChild(img);
+    //     const img = document.createElement("img");
+    //     img.src = "/static/images/settings.png";
+    //     img.alt = "settings";
+    //     img.className = "nav-icon";
+    //     settingsBtn.appendChild(img);
         
-        // Append the settings button to the navbar, perhaps before or after the stats/logout buttons.
-        document.querySelector(".navbar-links").appendChild(settingsBtn);
+    //     // Append the settings button to the navbar, perhaps before or after the stats/logout buttons.
+    //     document.querySelector(".navbar-links").appendChild(settingsBtn);
         
-        settingsBtn.addEventListener("click", () => {
-            const settingsModal = document.getElementById("settings-modal");
-            if (settingsModal) {
-                settingsModal.classList.remove("hidden");
-                const xIdInput = document.getElementById("x-id-input");
-                if (xIdInput) {
-                    xIdInput.value = userXId || "";
-                }
-            }
-        });
-    }    
+    //     settingsBtn.addEventListener("click", () => {
+    //         const settingsModal = document.getElementById("settings-modal");
+    //         if (settingsModal) {
+    //             settingsModal.classList.remove("hidden");
+    //             const xIdInput = document.getElementById("x-id-input");
+    //             if (xIdInput) {
+    //                 xIdInput.value = userXId || "";
+    //             }
+    //         }
+    //     });
+    // }    
 
     function checkSession() {
         fetch("/api/me", { credentials: 'include' })
@@ -143,7 +143,84 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (data.username) {
                     localStorage.setItem("username", data.username);
                     document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
-                    // After that, fetch additional stats.
+    
+                    // Clear existing navbar buttons
+                    const navbarLinks = document.querySelector(".navbar-links");
+                    navbarLinks.innerHTML = "";
+    
+                    // === DONATE BUTTON ===
+                    const donateBtn = document.createElement("a");
+                    donateBtn.href = "#donation-section";
+                    donateBtn.className = "navbar-link";
+                    donateBtn.title = "Donate";
+                    const donateImg = document.createElement("img");
+                    donateImg.src = "/static/images/donate.png";
+                    donateImg.alt = "donate";
+                    donateImg.className = "nav-icon";
+                    donateBtn.appendChild(donateImg);
+                    navbarLinks.appendChild(donateBtn);
+    
+                    // === STATS BUTTON ===
+                    const statsBtn = document.createElement("a");
+                    statsBtn.href = "#";
+                    statsBtn.className = "navbar-link";
+                    statsBtn.id = "stats-btn";
+                    statsBtn.title = "View Stats";
+                    const statsImg = document.createElement("img");
+                    statsImg.src = "/static/images/stats.png";
+                    statsImg.alt = "stats";
+                    statsImg.className = "nav-icon";
+                    statsBtn.appendChild(statsImg);
+                    navbarLinks.appendChild(statsBtn);
+                    statsBtn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        openStatsModal();
+                    });
+    
+                    // === SETTINGS BUTTON ===
+                    const settingsBtn = document.createElement("a");
+                    settingsBtn.href = "#";
+                    settingsBtn.className = "navbar-link";
+                    settingsBtn.id = "settings-btn";
+                    settingsBtn.title = "Settings";
+                    const settingsImg = document.createElement("img");
+                    settingsImg.src = "/static/images/settings.png";
+                    settingsImg.alt = "settings";
+                    settingsImg.className = "nav-icon";
+                    settingsBtn.appendChild(settingsImg);
+                    navbarLinks.appendChild(settingsBtn);
+                    settingsBtn.addEventListener("click", () => {
+                        const settingsModal = document.getElementById("settings-modal");
+                        if (settingsModal) {
+                            settingsModal.classList.remove("hidden");
+                            const xIdInput = document.getElementById("x-id-input");
+                            if (xIdInput) {
+                                xIdInput.value = userXId || "";
+                            }
+                        }
+                    });
+    
+                    // === LOGOUT BUTTON ===
+                    const logoutBtn = document.createElement("a");
+                    logoutBtn.href = "/logout";
+                    logoutBtn.className = "navbar-link";
+                    logoutBtn.id = "logout-btn";
+                    logoutBtn.title = "Logout";
+                    const logoutImg = document.createElement("img");
+                    logoutImg.src = "/static/images/logout-icon.png";
+                    logoutImg.alt = "logout";
+                    logoutImg.className = "nav-icon logout-icon";
+                    logoutBtn.appendChild(logoutImg);
+                    navbarLinks.appendChild(logoutBtn);
+                    logoutBtn.addEventListener("click", (e) => {
+                        document.getElementById("user-greeting").textContent = "";
+                        const statsBtn = document.getElementById("stats-btn");
+                        if (statsBtn) {
+                            statsBtn.remove();
+                        }
+                    });
+    
+                    // === Update Streak Display ===
                     fetch("/api/user_stats", { credentials: 'include' })
                         .then(response => response.json())
                         .then(stats => {
@@ -157,67 +234,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             }
                         })
                         .catch(err => console.error("Error fetching user stats:", err));
-                    // Update navbar: hide login button and add logout button if needed.
-                    const loginBtn = document.getElementById("login-btn");
-                    if (loginBtn) {
-                        loginBtn.style.display = "none";
-                    }
-                    if (!document.getElementById("logout-btn")) {
-                        const logoutBtn = document.createElement("a");
-                        logoutBtn.href = "/logout";
-                        logoutBtn.className = "navbar-link";
-                        logoutBtn.id = "logout-btn";
-                        logoutBtn.title = "Logout";
-                        const img = document.createElement("img");
-                        img.src = "/static/images/logout-icon.png";
-                        img.alt = "logout";
-                        img.className = "nav-icon logout-icon";
-                        logoutBtn.appendChild(img);
-                        document.querySelector(".navbar-links").appendChild(logoutBtn);
-                        logoutBtn.addEventListener("click", (e) => {
-                            document.getElementById("user-greeting").textContent = "";
-                            // Remove the stats button on logout:
-                            const statsBtn = document.getElementById("stats-btn");
-                            if (statsBtn) {
-                                statsBtn.remove();
-                            }
-                        });
-                    }
-                    if (!document.getElementById("stats-btn")) {
-                        const statsBtn = document.createElement("a");
-                        statsBtn.href = "#";  // Use a hash so it doesn’t trigger navigation.
-                        statsBtn.className = "navbar-link";
-                        statsBtn.id = "stats-btn";
-                        statsBtn.title = "View Stats";
-                        
-                        const statsImg = document.createElement("img");
-                        statsImg.src = "/static/images/stats.png"; // Ensure stats.png is in your static/images folder.
-                        statsImg.alt = "stats";
-                        statsImg.className = "nav-icon";
-                        
-                        statsBtn.appendChild(statsImg);
-                        // Insert the stats button before the logout button.
-                        const logoutBtn = document.getElementById("logout-btn");
-                        if (logoutBtn) {
-                            logoutBtn.parentNode.insertBefore(statsBtn, logoutBtn);
-                        } else {
-                            document.querySelector(".navbar-links").appendChild(statsBtn);
-                        }
-                        
-                        // Attach click event to open the stats modal.
-                        statsBtn.addEventListener("click", (e) => {
-                            e.preventDefault();
-                            openStatsModal();
-                        });
-                    }
-                } else {  
+                } else {
                     // No logged-in user found: show the authentication modal.
                     document.getElementById("auth-modal").classList.remove("hidden");
                 }
             })
             .catch(err => console.error("Error checking session:", err));
     }
-    
+        
     // Function to update the streak leaderboard display.
     function updateStreakLeaderboard() {
         fetch('/api/streak_leaderboard', { credentials: 'include' })

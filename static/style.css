@@ -963,6 +963,9 @@
   font-family: 'Manrope', sans-serif;
   width: 100%;
   text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 }
 
 /* Paragraph styling */
@@ -982,11 +985,11 @@
 }
 
 /* Modal buttons container */
-#auth-modal .modal-buttons {
+/* #auth-modal .modal-buttons {
   display: flex;
   justify-content: space-around;
   gap: 1rem;
-}
+} */
 
 /* Button styling */
 #auth-modal .btn {
@@ -1014,11 +1017,44 @@
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin-top: 0;
 }
 
 #auth-modal .play-game-btn:hover {
   box-shadow: 0 0 15px rgba(255, 186, 107, 0.8),
               0 0 25px rgba(135, 94, 0, 0.6);
+}
+
+.auth-modal-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-modal-btns p {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+}
+
+.auth-register-btn {
+  background: linear-gradient(45deg, #ad7748, #6d5229, #6f3f24);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-register-btn:hover {
+  box-shadow: 0 0 15px rgba(146, 106, 61, 0.8),
+              0 0 25px rgba(51, 36, 0, 0.6);
+}
+
+.auth-modal-logo {
+  width: 150px;
 }
 
 .delete-account-btn {

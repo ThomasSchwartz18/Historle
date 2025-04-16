@@ -299,7 +299,7 @@
   <div id="auth-modal" class="modal hidden">
     <div class="modal-content">
       <span id="auth-modal-close" class="modal-close">&times;</span>
-      <h2>Join Historle!</h2>
+      <h2>Join <img src="{{ url_for('static', filename='images/web-logo.png') }}" alt="" class="auth-modal-logo">!</h2>
       <p>What <i>you</i> get:</p>
       <ul>
         <li><b>Email free</b> signup</li>
@@ -308,9 +308,10 @@
         <li>Compete for <b>daily leaderboard</b> spots</li>
         <li>Longer win streaks can display on the <b>streak leaderboard</b>!</li>
       </ul>
-      <div class="modal-buttons">
+      <div class="modal-buttons auth-modal-btns">
+        <button id="open-register" class="auth-register-btn">Register</button>
         <button id="open-login" class="btn">Login</button>
-        <button id="open-register" class="btn">Register</button>
+        <p><i>or</i></p>
         <button id="play-game" class="play-game-btn">Play game</button>
       </div>
     </div>
