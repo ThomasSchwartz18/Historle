@@ -1030,4 +1030,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+    // after initializing everything in DOMContentLoaded:
+    const hash = window.location.hash;
+    if (hash === "#login") {
+        document.getElementById("login-modal").classList.remove("hidden");
+    } else if (hash === "#register") {
+        document.getElementById("register-modal").classList.remove("hidden");
+    }
+
 });

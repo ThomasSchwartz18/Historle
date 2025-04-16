@@ -980,7 +980,7 @@
   list-style: disc;
   padding-left: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #555;
+  color: #7b4a1a;
   width: 100%;
 }
 
@@ -998,7 +998,7 @@
   border: none;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  border-radius: 6px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -1009,20 +1009,15 @@
 }
 
 #auth-modal .play-game-btn {
-  border: 1px solid rgba(135, 94, 0, 0.6);
-  background-color: transparent;
-  color: rgba(135, 94, 0, 0.6);
-  border-radius: 6px;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
+  font-size: 0.85rem;
   cursor: pointer;
-  transition: background 0.3s ease;
   margin-top: 0;
-}
-
-#auth-modal .play-game-btn:hover {
-  box-shadow: 0 0 15px rgba(255, 186, 107, 0.8),
-              0 0 25px rgba(135, 94, 0, 0.6);
+  color: #555;
+  text-decoration: underline;
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  width: auto;
 }
 
 .auth-modal-btns {
@@ -1043,7 +1038,7 @@
   border: none;
   padding: 0.75rem 1.5rem;
   font-size: 1rem;
-  border-radius: 6px;
+  border-radius: 20px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
@@ -1192,10 +1187,6 @@
     }
 
     #auth-modal .btn {
-      padding: 0.35rem 0.75rem;
-    }
-
-    #auth-modal .play-game-btn {
       padding: 0.35rem 0.75rem;
     }
 
