@@ -180,7 +180,16 @@ def api_leaderboard():
                          .order("clues_used", desc=False) \
                          .limit(10) \
                          .execute()
-        leaderboard_data = result.data
+        leaderboard_data = result.data or []
+        # For each leaderboard entry, lookup the user's x_id from the users table.
+        for entry in leaderboard_data:
+            user_result = supabase.table("users") \
+                                  .select("x_id") \
+                                  .eq("username", entry["name"]) \
+                                  .single() \
+                                  .execute()
+            user_info = user_result.data
+            entry["x_id"] = user_info.get("x_id") if (user_info and user_info.get("x_id")) else None
         return jsonify(leaderboard_data)
     except Exception as e:
         print("Leaderboard fetch error:", e)
@@ -188,19 +197,16 @@ def api_leaderboard():
 
 @app.route("/api/submit_score", methods=["POST"])
 def submit_score():
-    """
-    API endpoint to submit a player's score.
-    Also updates the user's win/loss and streak statistics if registered.
-    """
     data = request.get_json()
     username = data.get("username")
-
-    # Ensure the session matches the provided username.
+    # Only registered users (i.e. whose session matches the provided username) can submit scores.
     if "username" not in session or session.get("username") != username:
         return jsonify({
             "success": True,
             "message": "Score submission skipped for non-registered user."
         })
+
+    # Read required fields
     solve_time = data.get("solve_time")
     clues_used = data.get("clues_used")
     event_date = data.get("event_date")
@@ -208,7 +214,7 @@ def submit_score():
     if not username or not solve_time or clues_used is None or not event_date:
         return jsonify({"error": "Missing data"}), 400
 
-    # Record the score in the leaderboard.
+    # Build our score entry
     score_entry = {
         "name": username,
         "solve_time": solve_time,
@@ -216,38 +222,40 @@ def submit_score():
         "date": event_date,
         "timestamp": datetime.now(timezone.utc).isoformat()
     }
-    # Store the user's X ID in the leaderboard entry.
-    # First, check if the client sent an x_id in the request.
-    if "x_id" in data and data["x_id"].strip():
-        score_entry["x_id"] = data["x_id"].strip()
-    else:
-        # Otherwise, retrieve the x_id from the user's record.
-        result = supabase.table("users").select("x_id").eq("username", username).single().execute()
-        user_info = result.data
-        if user_info and user_info.get("x_id"):
-            score_entry["x_id"] = user_info.get("x_id")
+
+    # Retrieve x_id either from the request or the user record.
+    # if "x_id" in data and data["x_id"].strip():
+    #     score_entry["x_id"] = data["x_id"].strip()
+    # else:
+    #     result = supabase.table("users").select("x_id").eq("username", username).single().execute()
+    #     user_info = result.data
+    #     if user_info and user_info.get("x_id"):
+    #         score_entry["x_id"] = user_info.get("x_id")
+
     try:
         supabase.table("leaderboard").insert(score_entry).execute()
     except Exception as e:
         print("Leaderboard insert error:", str(e))
         return jsonify({"error": "Failed to record leaderboard entry."}), 500
 
-    # Update user statistics.
+    # Update the user's statistics.
     try:
         result = supabase.table("users").select("*").eq("username", username).single().execute()
         user_data = result.data
         if not user_data:
             return jsonify({"error": "User not found."}), 404
+
         days_played = user_data.get("days_played") or 0
         total_wins = user_data.get("total_wins") or 0
         total_losses = user_data.get("total_losses") or 0
         current_streak = user_data.get("streak") or 0
         longest_win_streak = user_data.get("longest_win_streak") or 0
+
         today = datetime.strptime(event_date, "%Y-%m-%d").date()
         days_played += 1
-        current_game_day = get_current_game_date()  # e.g., "2025-04-12" using the 8:00pm cutoff logic
+
+        current_game_day = get_current_game_date()  # Using your game's cutoff logic.
         current_game_date_obj = datetime.strptime(current_game_day, "%Y-%m-%d").date()
-        
         if win:
             total_wins += 1
             last_win = user_data.get("last_win_date")
@@ -258,17 +266,19 @@ def submit_score():
                     current_streak += 1
                 elif day_difference > 1:
                     current_streak = 1
-                # If day_difference == 0, it's the same game day, so no change.
+                # day_difference == 0 means same day; no update.
             else:
                 current_streak = 1
+
             if current_streak > longest_win_streak:
                 longest_win_streak = current_streak
-            new_last_win_date = current_game_day  # store as a string in "YYYY-MM-DD" format
+            new_last_win_date = current_game_day
         else:
             total_losses += 1
             current_streak = 0
             new_last_win_date = user_data.get("last_win_date")
-        # Updated to also record the participation date as last_played_date.
+
+        # Update the user's statistics.
         supabase.table("users").update({
             "streak": current_streak,
             "days_played": days_played,
@@ -278,6 +288,7 @@ def submit_score():
             "last_win_date": new_last_win_date,
             "last_played_date": current_game_day
         }).eq("username", username).execute()
+
         return jsonify({
             "success": True,
             "streak": current_streak,
@@ -287,8 +298,9 @@ def submit_score():
             "longest_win_streak": longest_win_streak
         })
     except Exception as e:
-        print("User stats update error:", str(e))
-        return jsonify({"error": "Failed to update user stats."}), 500
+        error_message = str(e)
+        print("Leaderboard insert error:", error_message)
+        return jsonify({"error": f"Failed to record leaderboard entry. Error: {error_message}"}), 500
 
 @app.route("/api/already_played", methods=["POST"])
 def already_played():

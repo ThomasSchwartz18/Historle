@@ -498,6 +498,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function submitScoreAutomatically(timeTaken, win) {
         const payload = {
             username: localStorage.getItem("username"),
+            // Format the solve time as MM:SS
             solve_time: `${Math.floor(timeTaken / 60).toString().padStart(2, '0')}:${(timeTaken % 60).toString().padStart(2, '0')}`,
             clues_used: currentClueIndex + 1,
             event_date: currentEvent.date,
@@ -522,7 +523,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(err => showToast("Error submitting score.", true));
-    }
+    }    
 
     // Submit score using manual (non-automatic) submission.
     function submitScore() {
@@ -532,13 +533,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const cluesUsed = currentClueIndex + 1;
         const payload = {
             username: name,
-            solve_time: timeTaken,
+            solve_time: timeTaken,  // You could also opt to format this similarly to automatic submission if desired.
             clues_used: cluesUsed,
             event_date: currentEvent.date,
             win: true
         };
+        // Fix: use the variable userXId, not the literal string "userXId".
         if (userXId && userXId !== "") {
-            payload.x_id = `userXId`;
+            payload.x_id = userXId;
         }
         fetch("/api/submit_score", {
             credentials: 'include',
@@ -558,7 +560,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
         .catch(err => showToast("Error submitting score.", true));
-    }
+    }    
 
     // Refresh leaderboard entries.
     function updateLeaderboard() {
