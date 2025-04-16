@@ -108,6 +108,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    if (!document.getElementById("settings-btn")) {
+        const settingsBtn = document.createElement("a");
+        settingsBtn.href = "#";
+        settingsBtn.className = "navbar-link";
+        settingsBtn.id = "settings-btn";
+        settingsBtn.title = "Settings";
+        
+        const img = document.createElement("img");
+        img.src = "/static/images/settings.png";
+        img.alt = "settings";
+        img.className = "nav-icon";
+        settingsBtn.appendChild(img);
+        
+        // Append the settings button to the navbar, perhaps before or after the stats/logout buttons.
+        document.querySelector(".navbar-links").appendChild(settingsBtn);
+        
+        settingsBtn.addEventListener("click", () => {
+            const settingsModal = document.getElementById("settings-modal");
+            if (settingsModal) {
+                settingsModal.classList.remove("hidden");
+                const xIdInput = document.getElementById("x-id-input");
+                if (xIdInput) {
+                    xIdInput.value = userXId || "";
+                }
+            }
+        });
+    }    
+
     function checkSession() {
         fetch("/api/me", { credentials: 'include' })
             .then(response => response.json())
@@ -696,6 +724,110 @@ document.addEventListener("DOMContentLoaded", () => {
     });
     shareButton.addEventListener("click", handleShare);
     guessForm.addEventListener("submit", handleGuess);
+
+    // Settings button: when clicked, open the settings modal and prepopulate the x_id input.
+    const settingsBtn = document.getElementById("settings-btn");
+    if (settingsBtn) {
+        settingsBtn.addEventListener("click", () => {
+            const settingsModal = document.getElementById("settings-modal");
+            if (settingsModal) {
+                settingsModal.classList.remove("hidden");
+                const xIdInput = document.getElementById("x-id-input");
+                if (xIdInput) {
+                    // If there's an existing X profile, populate both value and placeholder.
+                    if (userXId) {
+                        xIdInput.value = userXId;
+                        xIdInput.placeholder = userXId;
+                    } else {
+                        xIdInput.value = "";
+                        xIdInput.placeholder = "Enter your X username";
+                    }
+                    console.log("Setting placeholder to:", xIdInput.placeholder);
+                }
+            }
+        });
+    }
+      
+    // Close settings modal when the "Close" button is clicked.
+    const closeSettingsBtn = document.getElementById("close-settings-btn");
+    if (closeSettingsBtn) {
+    closeSettingsBtn.addEventListener("click", () => {
+        const settingsModal = document.getElementById("settings-modal");
+        if (settingsModal) {
+        settingsModal.classList.add("hidden");
+        }
+    });
+    }
+
+    // Handle updating the X profile.
+    // This sends an API request to update the x_id for the current user.
+    const updateXIdBtn = document.getElementById("update-x-id");
+    if (updateXIdBtn) {
+      updateXIdBtn.addEventListener("click", () => {
+          const username = localStorage.getItem("username");
+          const xIdInput = document.getElementById("x-id-input");
+          const newXId = xIdInput.value.trim();
+          fetch("/api/update_x_profile", {
+              credentials: "include",
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: username, x_id: newXId })
+          })
+          .then(res => res.json())
+          .then(data => {
+              if (data.success) {
+                  showToast("X profile updated successfully!");
+                  userXId = data.x_id;  // Update the local variable.
+                  // Clear the input value and update the placeholder accordingly.
+                  xIdInput.value = "";
+                  xIdInput.placeholder = userXId;
+              } else {
+                  showToast(data.error || "Error updating X profile.", true);
+              }
+          })
+          .catch(err => {
+              console.error("Error updating X profile:", err);
+              showToast("Error updating X profile.", true);
+          });
+      });
+    }    
+
+    // Handle account deletion.
+    // The user must type their username to confirm account deletion.
+    const deleteAccountBtn = document.getElementById("delete-account-btn");
+    if (deleteAccountBtn) {
+    deleteAccountBtn.addEventListener("click", () => {
+        const username = localStorage.getItem("username");
+        const confirmUsername = document.getElementById("delete-confirm-input").value.trim();
+        if (username !== confirmUsername) {
+        showToast("Username confirmation does not match.", true);
+        return;
+        }
+        if (!confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+        return;
+        }
+        fetch("/api/delete_account", {
+        credentials: "include",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: username, confirm_username: confirmUsername })
+        })
+        .then(res => res.json())
+        .then(data => {
+        if (data.success) {
+            showToast("Account deleted successfully.");
+            // Redirect to the homepage after deletion or clear local storage.
+            window.location.href = "/";
+        } else {
+            showToast(data.error || "Error deleting account.", true);
+        }
+        })
+        .catch(err => {
+        console.error("Error deleting account:", err);
+        showToast("Error deleting account.", true);
+        });
+    });
+    }
 
     // Login and Register modal event bindings.
     document.getElementById("login-btn").addEventListener("click", (e) => {

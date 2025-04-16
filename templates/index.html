@@ -51,22 +51,25 @@
             <img src="{{ url_for('static', filename='images/history-icon.png')}}" alt="previous prompts" class="nav-icon history-icon">
           </a> -->
           {% if not session.logged_in %}
-          <a href="#donation-section" class="navbar-link" title="donate">
-            <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-          </a>
-          <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
-            <p>Login / Register</p>
-          </a>
-          <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
-            <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
-          </a> -->
+            <a href="#donation-section" class="navbar-link" title="donate">
+              <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
+            </a>
+            <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
+              <p>Login / Register</p>
+            </a>
+            <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
+              <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
+            </a> -->
           {% else %}
-          <a href="#donation-section" class="navbar-link" title="donate">
-            <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-          </a>
-          <a href="/logout" class="navbar-link" title="Logout">
-            <img src="{{ url_for('static', filename='images/logout-icon.png')}}" alt="logout" class="nav-icon logout-icon">
-          </a>
+            <a href="#donation-section" class="navbar-link" title="donate">
+              <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
+            </a>
+            <a id="settings-btn" href="#" class="navbar-link" title="Settings">
+              <img src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" class="nav-icon">
+            </a>
+            <a href="/logout" class="navbar-link" title="Logout">
+              <img src="{{ url_for('static', filename='images/logout-icon.png')}}" alt="logout" class="nav-icon logout-icon">
+            </a>
           {% endif %}
         </div>
       </nav>
@@ -313,6 +316,27 @@
     </div>
   </div>
 
+  <!-- Modal for settings -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="close-settings-btn" class="modal-close" aria-label="Close Settings">&times;</button>
+      <h2>Account Settings</h2>
+      <label for="x-id-input">Your X Username</label>
+      <br>
+      <div class="update-x-container">
+        <input type="text" id="x-id-input" placeholder="JohnSmith123">
+        <button id="update-x-id">Update X Profile</button>
+      </div>
+  
+      <hr>
+  
+      <h3>Delete Account</h3>
+      
+      <p>Type your username to confirm deletion:</p>
+      <input type="text" id="delete-confirm-input" placeholder="Your Historle username">
+      <button id="delete-account-btn" class="delete-account-btn">Delete Account</button>
+    </div>
+  </div>
 
   <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
     Debug

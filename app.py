@@ -438,6 +438,52 @@ def streak_leaderboard():
     except Exception as e:
         print("Error fetching streak leaderboard:", e)
         return jsonify({"error": "Failed to fetch streak leaderboard"}), 500
+  
+# Update X profile in user settings  
+@app.route("/api/update_x_profile", methods=["POST"])
+def update_x_profile():
+    data = request.get_json()
+    username = data.get("username")
+    new_x_id = data.get("x_id", "").strip()
+    
+    # Ensure the user is authenticated.
+    if "username" not in session or session.get("username") != username:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    # Optional: Validate the new X username.
+    if new_x_id and not is_valid_x_username(new_x_id):
+        return jsonify({"error": "Invalid X username provided."}), 400
+    
+    try:
+        supabase.table("users").update({"x_id": new_x_id}).eq("username", username).execute()
+        return jsonify({"success": True, "x_id": new_x_id})
+    except Exception as e:
+        print("Update x profile error:", str(e))
+        return jsonify({"error": "Failed to update X profile."}), 500
+
+# Account deletion in user settings
+@app.route("/api/delete_account", methods=["POST"])
+def delete_account():
+    data = request.get_json()
+    username = data.get("username", "").strip()
+    confirm_username = data.get("confirm_username", "").strip()
+    
+    # Verify that the session username matches the provided one
+    if "username" not in session or session.get("username") != username:
+        return jsonify({"error": "Not authenticated"}), 401
+    
+    # Check that the confirmation matches exactly
+    if username != confirm_username:
+        return jsonify({"error": "Confirmation username does not match."}), 400
+
+    try:
+        # Remove the user from the users table.
+        supabase.table("users").delete().eq("username", username).execute()
+        session.clear()  # Clear the session upon deletion.
+        return jsonify({"success": True})
+    except Exception as e:
+        print("Error deleting account:", str(e))
+        return jsonify({"error": "Failed to delete account."}), 500
 
 if __name__ == "__main__":
     # In production, debug should be disabled for security reasons.

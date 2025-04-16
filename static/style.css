@@ -1021,6 +1021,15 @@
               0 0 25px rgba(135, 94, 0, 0.6);
 }
 
+.delete-account-btn {
+  border: 1px solid red;
+  background-color: transparent;
+  color: red;
+}
+
+.update-x-container {
+  margin-bottom: 1rem;
+}
 
 /* Entry animation for the modal content */
 @keyframes slideIn {
