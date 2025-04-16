@@ -1153,6 +1153,10 @@
     #auth-modal .play-game-btn {
       padding: 0.35rem 0.75rem;
     }
+
+    .previous-clues .clue {
+      font-size: medium;
+    }
   }
   
   @media (max-width: 600px) {
