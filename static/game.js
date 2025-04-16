@@ -71,6 +71,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Event listeners for auth modal (located in index.html)
+    const authLoginBtn = document.getElementById("open-login");
+    if (authLoginBtn) {
+        authLoginBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal("auth-modal");
+            document.getElementById("login-modal").classList.remove("hidden");
+        });
+    }
+
+    const authRegisterBtn = document.getElementById("open-register");
+    if (authRegisterBtn) {
+        authRegisterBtn.addEventListener("click", (e) => {
+            e.preventDefault();
+            closeModal("auth-modal");
+            document.getElementById("register-modal").classList.remove("hidden");
+        });
+    }
+
+    // Add a close event listener to the auth modal close icon.
+    const authModalClose = document.getElementById("auth-modal-close");
+    if (authModalClose) {
+        authModalClose.addEventListener("click", () => {
+            closeModal("auth-modal");
+        });
+    }
+
     function checkSession() {
         fetch("/api/me", { credentials: 'include' })
             .then(response => response.json())
@@ -145,11 +172,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             openStatsModal();
                         });
                     }
+                } else {  
+                    // No logged-in user found: show the authentication modal.
+                    document.getElementById("auth-modal").classList.remove("hidden");
                 }
             })
             .catch(err => console.error("Error checking session:", err));
-    }     
-
+    }
+    
     // Function to update the streak leaderboard display.
     function updateStreakLeaderboard() {
         fetch('/api/streak_leaderboard', { credentials: 'include' })
