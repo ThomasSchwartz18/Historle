@@ -1140,6 +1140,19 @@
     .floating-img-4 {
       display: none;
     }
+
+    #auth-modal {
+      padding-left: 5px;
+      padding-right: 5px;
+    }
+
+    #auth-modal .btn {
+      padding: 0.35rem 0.75rem;
+    }
+
+    #auth-modal .play-game-btn {
+      padding: 0.35rem 0.75rem;
+    }
   }
   
   @media (max-width: 600px) {
