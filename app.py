@@ -2,6 +2,7 @@ import os
 from datetime import datetime, date, timezone, timedelta
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 import re
+from rapidfuzz import fuzz
 from better_profanity import profanity
 from supabase import create_client, Client
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -29,6 +30,8 @@ if not SUPABASE_URL or not SUPABASE_KEY:
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 profanity.load_censor_words()
+
+FUZZ_THRESHOLD = 75
 
 def is_valid_name(name: str) -> bool:
     """Name shown on leaderboard. Must be safe, short, and clean."""
@@ -148,23 +151,34 @@ def reveal_answer():
 
 @app.route("/api/guess", methods=["POST"])
 def check_guess():
-    """
-    Secure endpoint to validate a player's guess.
-    The guess is compared against the correct answer and alternative answers.
-    """
     data = request.get_json()
     guess = data.get("guess", "").strip().lower()
     event_date = data.get("event_date")
     if not guess or not event_date:
         return jsonify({"error": "Invalid guess data"}), 400
+
     event = get_event_for_today()
     if not event or event.get("date") != event_date:
         return jsonify({"error": "Event mismatch"}), 403
+
+    # Prepare your canonical answer and alt answers
     correct = event.get("answer", "").strip().lower()
-    alt_answers = event.get("alt_answers", [])
-    alt_answers = [a.strip().lower() for a in alt_answers] if alt_answers else []
+    alt_answers = [a.strip().lower() for a in event.get("alt_answers", [])]
+
+    # 1) Exact match
     if guess == correct or guess in alt_answers:
         return jsonify({"correct": True})
+
+    # 2) Fuzzy match against the official answer
+    if fuzz.token_set_ratio(guess, correct) >= FUZZ_THRESHOLD:
+        return jsonify({"correct": True})
+
+    # 3) Fuzzy match against each alt answer
+    for alt in alt_answers:
+        if fuzz.token_set_ratio(guess, alt) >= FUZZ_THRESHOLD:
+            return jsonify({"correct": True})
+
+    # 4) Otherwise wrong
     return jsonify({"correct": False})
 
 @app.route("/api/leaderboard", methods=["GET"])
