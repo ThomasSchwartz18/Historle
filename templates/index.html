@@ -47,13 +47,15 @@
       <nav class="navbar">
         <div id="user-greeting" style="display: hidden;"></div>
         <div class="navbar-links">
-          <!-- <a href="#" id="prev-days-btn" class="navbar-link" title="View Previous Prompts">
-            <img src="{{ url_for('static', filename='images/history-icon.png')}}" alt="previous prompts" class="nav-icon history-icon">
-          </a> -->
+          <!-- Always show Articles -->
+          <a href="/articles" class="navbar-link" title="Articles">
+            <img src="{{ url_for('static', filename='images/articles.png') }}"
+                alt="Articles" class="nav-icon">
+          </a>
           {% if not session.logged_in %}
-            <a href="#donation-section" class="navbar-link" title="donate">
+            <!-- <a href="#donation-section" class="navbar-link" title="donate">
               <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-            </a>
+            </a> -->
             <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
               <p>Login / Register</p>
             </a>
@@ -61,9 +63,9 @@
               <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
             </a> -->
           {% else %}
-            <a href="#donation-section" class="navbar-link" title="donate">
+            <!-- <a href="#donation-section" class="navbar-link" title="donate">
               <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-            </a>
+            </a> -->
             <a id="settings-btn" href="#" class="navbar-link" title="Settings">
               <img src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" class="nav-icon">
             </a>
@@ -178,7 +180,7 @@
         </div>
       </div>
       <!-- Donation Button Section -->
-      <div class="donation-section" id="donation-section">
+      <!-- <div class="donation-section" id="donation-section">
         <div class="donation-container">
           <h2>Help keep Historle ad-free and educational</h2>
           <p>Your donation supports ongoing development, hosting, and future features that make learning history fun and accessible for everyone.</p>
@@ -199,7 +201,7 @@
             </script>
           </div>  
         </div>
-      </div>
+      </div> -->
     </footer>
   </div>
   <div id="game-over" class="modal hidden">

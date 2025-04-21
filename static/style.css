@@ -66,10 +66,6 @@
   .navbar-links {
     display: flex;
     gap: 1rem;
-  }
-  
-  .navbar-link {
-    display: flex;
     justify-content: center;
     align-items: center;
   }
@@ -92,7 +88,7 @@
     color: rgb(255, 255, 255);
     padding: 5px 14px;
     border-radius: 50px;
-    background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
+    background: linear-gradient(45deg, #ad7748, #6d5229, #6f3f24);
     transition: box-shadow 0.3s ease;
 }
 

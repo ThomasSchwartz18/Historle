@@ -92,6 +92,14 @@ def index():
     """Serves the main HTML page."""
     return render_template("index.html")
 
+@app.route("/articles")
+def articles():
+    """
+    Serves the Articles page—a place for historical write‑ups.
+    """
+    # In future, you can query a ‘posts’ table and pass posts=list_of_posts
+    return render_template("articles.html")
+
 @app.route("/api/event", methods=["GET"])
 def api_event():
     """API endpoint to retrieve today's historical event without sensitive answer data."""

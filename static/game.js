@@ -147,18 +147,30 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Clear existing navbar buttons
                     const navbarLinks = document.querySelector(".navbar-links");
                     navbarLinks.innerHTML = "";
+
+                    // === ARTICLES BUTTON ===
+                    const articlesBtn = document.createElement("a");
+                    articlesBtn.href = "/articles";
+                    articlesBtn.className = "navbar-link";
+                    articlesBtn.title = "Articles";
+                    const articlesImg = document.createElement("img");
+                    articlesImg.src = "/static/images/articles.png";
+                    articlesImg.alt = "Articles";
+                    articlesImg.className = "nav-icon";
+                    articlesBtn.appendChild(articlesImg);
+                    navbarLinks.appendChild(articlesBtn);
     
                     // === DONATE BUTTON ===
-                    const donateBtn = document.createElement("a");
-                    donateBtn.href = "#donation-section";
-                    donateBtn.className = "navbar-link";
-                    donateBtn.title = "Donate";
-                    const donateImg = document.createElement("img");
-                    donateImg.src = "/static/images/donate.png";
-                    donateImg.alt = "donate";
-                    donateImg.className = "nav-icon";
-                    donateBtn.appendChild(donateImg);
-                    navbarLinks.appendChild(donateBtn);
+                    // const donateBtn = document.createElement("a");
+                    // donateBtn.href = "#donation-section";
+                    // donateBtn.className = "navbar-link";
+                    // donateBtn.title = "Donate";
+                    // const donateImg = document.createElement("img");
+                    // donateImg.src = "/static/images/donate.png";
+                    // donateImg.alt = "donate";
+                    // donateImg.className = "nav-icon";
+                    // donateBtn.appendChild(donateImg);
+                    // navbarLinks.appendChild(donateBtn);
     
                     // === STATS BUTTON ===
                     const statsBtn = document.createElement("a");
