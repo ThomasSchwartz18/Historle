@@ -31,7 +31,7 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 profanity.load_censor_words()
 
-FUZZ_THRESHOLD = 75
+FUZZ_THRESHOLD = 79
 
 def is_valid_name(name: str) -> bool:
     """Name shown on leaderboard. Must be safe, short, and clean."""
@@ -161,7 +161,6 @@ def check_guess():
     if not event or event.get("date") != event_date:
         return jsonify({"error": "Event mismatch"}), 403
 
-    # Prepare your canonical answer and alt answers
     correct = event.get("answer", "").strip().lower()
     alt_answers = [a.strip().lower() for a in event.get("alt_answers", [])]
 
@@ -169,13 +168,13 @@ def check_guess():
     if guess == correct or guess in alt_answers:
         return jsonify({"correct": True})
 
-    # 2) Fuzzy match against the official answer
-    if fuzz.token_set_ratio(guess, correct) >= FUZZ_THRESHOLD:
+    # 2) Fuzzy match against the official answer (character‑based)
+    if fuzz.ratio(guess, correct) >= FUZZ_THRESHOLD:
         return jsonify({"correct": True})
 
-    # 3) Fuzzy match against each alt answer
+    # 3) Fuzzy match against each alt answer (character‑based)
     for alt in alt_answers:
-        if fuzz.token_set_ratio(guess, alt) >= FUZZ_THRESHOLD:
+        if fuzz.ratio(guess, alt) >= FUZZ_THRESHOLD:
             return jsonify({"correct": True})
 
     # 4) Otherwise wrong
