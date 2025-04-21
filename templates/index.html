@@ -45,7 +45,7 @@
   <div class="container">
     <header>
       <nav class="navbar">
-        <div id="user-greeting"></div>
+        <div id="user-greeting" style="display: hidden;"></div>
         <div class="navbar-links">
           <!-- <a href="#" id="prev-days-btn" class="navbar-link" title="View Previous Prompts">
             <img src="{{ url_for('static', filename='images/history-icon.png')}}" alt="previous prompts" class="nav-icon history-icon">
@@ -210,17 +210,9 @@
         <h2 id="result-header"></h2>
         <p id="correct-answer"></p>
         <div class="summary" id="event-summary"></div>
-        <div class="name-entry hidden" id="name-entry">
-          <p>Congratulations! Enter your name for the leaderboard:</p>
-          <div class="input-group">
-            <input type="text" id="player-name" placeholder="Your name" maxlength="20" aria-label="Enter your name">
-          </div>
-          <p>Optional: Enter your X username:</p>
-          <div class="input-group">
-            <input type="text" id="x-username" placeholder="Your X username (optional)" maxlength="30" aria-label="Enter your X username">
-          </div>
-          <button id="submit-score" aria-label="Submit score">Submit Score</button>
-        </div>
+        <!-- add this right below the summary -->
+        <div id="all-clues-container" class="all-clues-container"></div>
+        <div class="name-entry hidden" id="name-entry">…</div>
         <button id="share-button" class="share-button">Share Result</button>
         <p class="return-tomorrow">Come back tomorrow for a new historical moment!</p>
       </div>

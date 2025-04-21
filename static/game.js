@@ -343,23 +343,38 @@ document.addEventListener("DOMContentLoaded", () => {
     // Function to securely reveal the answer and summary.
     function revealAnswerAndSummary() {
         fetch("/api/reveal_answer", {
-            credentials: 'include',
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ event_date: currentEvent.date })
+          credentials: 'include',
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ event_date: currentEvent.date })
         })
         .then(res => res.json())
         .then(data => {
-            correctAnswerEl.textContent = `Answer: ${escapeHTML(data.answer.toUpperCase())}`;
-            eventSummaryEl.textContent = data.summary || "No summary available.";
-            correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
-            altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
+          // existing code
+          correctAnswerEl.textContent = `Answer: ${escapeHTML(data.answer.toUpperCase())}`;
+          eventSummaryEl.textContent = data.summary || "No summary available.";
+      
+          // NEW: populate all the clues
+          const allCluesContainer = document.getElementById("all-clues-container");
+          allCluesContainer.innerHTML = "<h3>All Clues:</h3>";
+          if (currentEvent && currentEvent.clues) {
+            currentEvent.clues.forEach(clue => {
+              const p = document.createElement("p");
+              p.className = "clue-text";
+              p.textContent = clue;
+              allCluesContainer.appendChild(p);
+            });
+          }
+      
+          // existing code continues...
+          correctAnswer = data.answer ? data.answer.trim().toLowerCase() : "";
+          altAnswers = data.alt_answers ? data.alt_answers.map(a => a.trim().toLowerCase()) : [];
         })
         .catch(err => {
-            correctAnswerEl.textContent = "Error revealing answer.";
-            console.error("Reveal failed:", err);
+          correctAnswerEl.textContent = "Error revealing answer.";
+          console.error("Reveal failed:", err);
         });
-    }
+    }      
 
     // Fetch today's event.
     function fetchEvent() {

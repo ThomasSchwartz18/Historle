@@ -132,6 +132,11 @@
   display: inline-block; /* this makes the container shrink to fit its content */
 }
 
+.navbar-left img {
+  width: 60px;
+  height: 60px;
+}
+
 /* Floating image styles (if not already present) */
 .floating-img {
   position: absolute;
@@ -1060,6 +1065,25 @@
 
 .update-x-container {
   margin-bottom: 1rem;
+}
+
+/* All‑Clues section in game‑over modal */
+.all-clues-container {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.all-clues-container h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.all-clues-container .clue-text {
+  margin: 0.25rem 0;
+  line-height: 1.4;
+  border-bottom: 1px solid rgb(68, 32, 0);
 }
 
 /* Entry animation for the modal content */
