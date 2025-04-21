@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
 /* Root Variables */
 :root {
@@ -32,7 +32,7 @@
   }
   
   body {
-    font-family: "Manrope", "Open Sans";
+    font-family: "Inter";
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
@@ -310,7 +310,7 @@
   
   .year-display {
     text-align: center;
-    font-family: 'Open Sans', serif;
+    font-family: 'Inter', serif;
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
     color: var(--accent-color);
@@ -332,7 +332,7 @@
     padding: 1.5rem;
     text-align: center;
     font-size: xx-large;
-    font-family: 'Open Sans', serif;
+    font-family: 'Inter', serif;
     animation: fadeIn 0.5s ease-in;
     margin-bottom: 0rem;
     margin-top: 0;
@@ -348,7 +348,7 @@
     transition: opacity 0.3s ease, transform 0.3s ease;
     background: var(--background-color);
     padding: 0.25rem;
-    font-family: 'Open Sans', serif;
+    font-family: 'Inter', serif;
   }
   
   /* Progress Bar */
@@ -486,7 +486,7 @@
 }
 
 .leaderboard h2 {
-  font-family: 'Open Sans', serif;
+  font-family: 'Inter', serif;
   color: #8b4513;
   margin-bottom: 1rem;
   text-align: center;
@@ -610,7 +610,7 @@
     display: flex;
     justify-content: center;
     gap: 1.5rem;
-    font-family: 'Open Sans', serif;
+    font-family: 'Inter', serif;
   }
   
   .countdown-item {
@@ -704,7 +704,7 @@
   .result-container h2 {
     color: var(--primary-color);
     margin-bottom: 1rem;
-    font-family: 'Open Sans', serif;
+    font-family: 'Inter', serif;
   }
   
   .summary {
@@ -823,7 +823,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  font-family: "Open Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   transition: transform 0.3s ease;
 }
 .stats-section:hover {
@@ -960,7 +960,7 @@
 #auth-modal h2 {
   margin-bottom: 1rem;
   color: #2c3e50;
-  font-family: 'Manrope', sans-serif;
+  font-family: 'Inter', sans-serif;
   width: 100%;
   text-align: center;
   align-items: center;
