@@ -8,8 +8,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const full = post.querySelector(".full-article");
         full.classList.toggle("hidden");
         link.textContent = full.classList.contains("hidden")
-          ? "Read more →"
-          : "Show less ↑";
+          ? "show more →"
+          : "show less ↑";
       });
     });
   });
