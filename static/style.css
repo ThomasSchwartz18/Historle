@@ -286,7 +286,28 @@
     color: #000;
     text-decoration: underline;
   }
+
+  .game-over-modal-article {
+    display: inline-block;
+    margin: 1.5rem 0;             /* space above/below */
+    padding: 0.5rem 1.2rem;       /* clickable padding */
+    background-color: var(--accent-color);
+    color: #FFFFFF;
+    border-radius: 1.5rem;        /* pill shape */
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+  }
   
+  .game-over-modal-article:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-2px);
+  }
+  
+  .game-over-modal-article:active {
+    transform: translateY(0);
+  }
+
   /* Difficulty and Year Display */
   .difficulty-display {
     text-align: center;
@@ -700,6 +721,9 @@
   
   .result-container {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   
   .result-container h2 {
