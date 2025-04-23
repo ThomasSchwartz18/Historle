@@ -341,6 +341,21 @@ document.addEventListener("DOMContentLoaded", () => {
         setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
+    // create a confetti instance that draws into our #confetti-canvas
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const myConfetti = confetti.create(confettiCanvas, {
+    resize: true,   // auto-resize when the window changes
+    useWorker: true // offload physics to a web worker
+    });
+
+    function triggerConfetti() {
+        myConfetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 }
+        });
+    }
+
     // Helper: display field error.
     function showFieldError(fieldId, message) {
         const oldError = document.querySelector(`#${fieldId} + .auth-error`);
@@ -538,6 +553,8 @@ document.addEventListener("DOMContentLoaded", () => {
         revealAnswerAndSummary();
         const storedUsername = localStorage.getItem("username");
         if (success) {
+            // Confetti burst!
+            triggerConfetti();
             if (storedUsername) {
                 nameInput.value = storedUsername;
                 submitScoreAutomatically(timeTaken, true);

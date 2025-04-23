@@ -39,6 +39,18 @@
   <meta name="google-adsense-account" content="ca-pub-8830819691283646">
 </head>
 <body>
+  <!-- CONFETTI CANVAS: sits on top of everything -->
+  <canvas
+    id="confetti-canvas"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;">
+  </canvas>
   <div id="bookmark-banner" class="bookmark-banner">
     <p>consider bookmarking!</p>
   </div>   
@@ -345,6 +357,9 @@
   <!-- <button id="debug-btn" style="position: fixed; bottom: 10px; right: 10px; z-index: 999; display: none;">
     Debug
   </button> -->
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
   <script src="{{ url_for('static', filename='game.js') }}"></script>
   <div id="toast" class="toast hidden"></div>
 </body>
