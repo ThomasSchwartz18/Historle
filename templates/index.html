@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Historle - Guess the moment. One clue at a time.</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo1.png') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo1.png') }}">
@@ -61,45 +61,43 @@
   <div class="container">
     <header>
       <nav class="navbar">
-        <div id="user-greeting" style="display: hidden;"></div>
-        <div class="navbar-links">
-          <!-- Always show Articles -->
-          <a href="/articles" class="navbar-link" title="Articles">
-            <img src="{{ url_for('static', filename='images/articles.png') }}"
-                alt="Articles" class="nav-icon">
-          </a>
-          {% if not session.logged_in %}
-            <!-- <a href="#donation-section" class="navbar-link" title="donate">
-              <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-            </a> -->
-            <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
-              <p>Login / Register</p>
+        <div class="navbar-left">
+          <img src="{{ url_for('static', filename='images/logo1.png')}}" alt="">
+          <div id="user-greeting" style="display: hidden;"></div>
+        </div>
+        <div class="navbar-right">
+          <div class="navbar-links">
+            <!-- Always show Articles -->
+            <a href="/articles" class="navbar-link" title="Articles">
+              <img src="{{ url_for('static', filename='images/articles.png') }}"
+                  alt="Articles" class="nav-icon">
             </a>
-            <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
-              <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
-            </a> -->
-          {% else %}
-            <!-- <a href="#donation-section" class="navbar-link" title="donate">
-              <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
-            </a> -->
-            <a id="settings-btn" href="#" class="navbar-link" title="Settings">
-              <img src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" class="nav-icon">
-            </a>
-            <a href="/logout" class="navbar-link" title="Logout">
-              <img src="{{ url_for('static', filename='images/logout-icon.png')}}" alt="logout" class="nav-icon logout-icon">
-            </a>
-          {% endif %}
+            {% if not session.logged_in %}
+              <!-- <a href="#donation-section" class="navbar-link" title="donate">
+                <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
+              </a> -->
+              <a href="#" id="login-btn" class="navbar-link login-register-navbar-button" title="Login/Register">
+                <p>Login / Register</p>
+              </a>
+              <!-- <a href="#" id="register-btn" class="navbar-link" title="Register">
+                <img src="{{ url_for('static', filename='images/register-icon.png')}}" alt="register" class="nav-icon register-icon">
+              </a> -->
+            {% else %}
+              <!-- <a href="#donation-section" class="navbar-link" title="donate">
+                <img src="{{ url_for('static', filename='images/donate.png')}}" alt="donate" class="nav-icon">
+              </a> -->
+              <a id="settings-btn" href="#" class="navbar-link" title="Settings">
+                <img src="{{ url_for('static', filename='images/settings.png') }}" alt="Settings" class="nav-icon">
+              </a>
+              <a href="/logout" class="navbar-link" title="Logout">
+                <img src="{{ url_for('static', filename='images/logout-icon.png')}}" alt="logout" class="nav-icon logout-icon">
+              </a>
+            {% endif %}
+          </div>
         </div>
       </nav>
       <div class="header-text">
         <div class="navbar-logo">
-          <img src="{{ url_for('static', filename='images/floating-img-1.png') }}" alt="Floating Image 1" class="floating-img floating-img-1">
-          <img src="{{ url_for('static', filename='images/floating-img-2.png') }}" alt="Floating Image 2" class="floating-img floating-img-2">
-          <img src="{{ url_for('static', filename='images/floating-img-3.png') }}" alt="Floating Image 3" class="floating-img floating-img-3">
-          <img src="{{ url_for('static', filename='images/floating-img-4.png') }}" alt="Floating Image 4" class="floating-img floating-img-4">
-          <a href="/">
-            <img src="{{ url_for('static', filename='images/web-logo.png') }}" alt="Historle Logo" class="header-logo">
-          </a>
           <!-- New element to display the win streak (only visible for logged-in users) -->
           <div class="streak-section">
             <div class="streak-container" id="streak-container">
@@ -120,12 +118,15 @@
     <main>
       <div class="game-section">
         <div class="game-container">
-          <div class="year-display" aria-label="Event Year">
+          <div class="difficulty-display" aria-label="Event Difficulty">
+            Today's Difficulty: <span id="event-difficulty">Loading difficulty...</span>
+          </div>
+          <div class="category-display" aria-label="Event Year">
             Category: <b><span id="event-year">????</span></b>
           </div>
           <div class="game-box">
             <div class="clues-container">
-              <p>hints:</p>
+              <p><i>hints:</i></p>
               <div class="clue current-clue" id="current-clue" aria-live="polite">Loading clue...</div>
               <div class="previous-clues" id="previous-clues"></div>
             </div>
@@ -133,16 +134,13 @@
               <div class="input-wrapper">
                 <input type="text" id="guess-input" placeholder="Take a guess..." aria-label="Enter your guess" autocomplete="off" required>
                 <button type="submit" aria-label="Submit guess" class="submit-inside">
-                  <span class="arrow-icon">⏎</span>
+                  <span class="arrow-icon">Submit</span>
                 </button>
               </div>
               <p class="clues-remaining">Remaining guesses: <span id="guesses-left">5</span></p>
             </form>          
             <div class="progress-container">
               <div class="progress-bar" id="progress-bar"></div>
-            </div>
-            <div class="difficulty-display" aria-label="Event Difficulty">
-              Today's Difficulty: <span id="event-difficulty">Loading difficulty...</span>
             </div>
           </div>
         </div>
@@ -177,7 +175,6 @@
       </div>
     </main>
     <footer>
-      <p>A daily historical event guessing game</p>
       <div class="countdown-container">
         <p>Next historical moment in:</p>
         <div class="countdown" id="countdown">
@@ -220,13 +217,13 @@
       </div> -->
       <section class="footer-text" style="width: 100%;text-align: center;display: flex;flex-direction: column;justify-content: center;align-items: center;margin-top: 1.5rem;">
         <h2>About Historle</h2>
-        <p style="width: 50%;">
+        <p>
           Historle is a daily history quiz that challenges you to guess a single moment/person/location in time
           from ancient achievements to more modern milestones. Each day you get five clues, and your mission
-          is to name the year. Sharpen your skills, track your win streak, and see how you rank on the
+          is to name the event. Sharpen your skills, track your win streak, and see how you rank on the
           global leaderboard.
         </p>
-        <p style="width: 50%;">
+        <p>
           Create a free account to save your progress, link your X handle, and view full-length
           articles on historical events in our Articles section. Ready to test your knowledge?
         </p>
@@ -354,17 +351,11 @@
     <div class="modal-content">
       <button id="close-settings-btn" class="modal-close" aria-label="Close Settings">&times;</button>
       <h2>Account Settings</h2>
-      <label for="x-id-input">Your X Username</label>
-      <br>
-      <div class="update-x-container">
-        <input type="text" id="x-id-input" placeholder="JohnSmith123">
-        <button id="update-x-id">Update X Profile</button>
-      </div>
-  
+      <p>Change your X Username</p>
+      <input type="text" id="x-id-input" placeholder="JohnSmith123">
+      <button id="update-x-id">Update X Profile</button>
       <hr>
-  
-      <h3>Delete Account</h3>
-      
+      <h2>Delete Account</h2>
       <p>Type your username to confirm deletion:</p>
       <input type="text" id="delete-confirm-input" placeholder="Your Historle username">
       <button id="delete-account-btn" class="delete-account-btn">Delete Account</button>

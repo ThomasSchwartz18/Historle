@@ -283,6 +283,11 @@ document.addEventListener("DOMContentLoaded", () => {
                         const anchor = document.createElement("a");
                         anchor.href = `https://x.com/${entry.x_id}`;
                         anchor.innerHTML = escapeHTML(formatUsername(entry.username));
+                        const xLogoImg = document.createElement("img");
+                        xLogoImg.src = "/static/images/x-logo.png";
+                        xLogoImg.alt = "X Logo";
+                        xLogoImg.className = "x-logo";
+                        anchor.appendChild(xLogoImg);
                         nameSpan.appendChild(anchor);
                     } else {
                         nameSpan.textContent = escapeHTML(formatUsername(entry.username));

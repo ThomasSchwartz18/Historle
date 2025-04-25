@@ -1,0 +1,1218 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+  font-family: 'Inter';
+  margin: 0;
+  padding: 0;
+}
+
+/* ─── Bookmark Alert ────────────────────────────────────────────────────────── */
+.bookmark-banner {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translate(-50%, -150%);
+  transition: transform 0.5s ease;
+  background-color: #402310ac;
+  color: white;
+
+  /* flex centering */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* padding + optional height cap */
+  padding: 0rem 1rem;
+  /* remove or increase if it’s clipping: */
+  max-height: none;
+
+  font-size: 0.9rem;
+  /* remove line-height when using flex centering */
+  line-height: normal;
+
+  border-radius: 8px;
+  z-index: 10000;
+  text-align: center;
+}
+
+/* When visible, slide down into view */
+.bookmark-banner.visible {
+  transform: translate(-50%, 0);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #402310;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-left img {
+  width: 60px;
+  height: 60px;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-right .navbar-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.navbar-link {
+  gap: 1rem;
+}
+
+.navbar-link:hover .nav-icon {
+  display: inline-block;
+  animation: wiggle 0.4s ease-in-out;
+}
+
+.login-register-navbar-button {
+  background: linear-gradient(45deg, #ad7748, #6d5229, #6f3f24);
+  position: relative;
+  text-decoration: none;
+  color: rgb(255, 255, 255);
+  padding: 5px 14px;
+  border-radius: 50px;
+  max-height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-register-navbar-button:hover {
+  box-shadow: 0 0 15px rgba(255, 186, 107, 0.8),
+              0 0 25px rgba(135, 94, 0, 0.6);
+}
+
+/* Streak Display */
+.streak-section {
+  width: 100%;
+  border-bottom: 1px solid #402310;
+}
+
+.streak-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.25rem;
+  color: #402310;
+}
+
+.login-link {
+  color: black;
+}
+
+.streak-display {
+  margin-right: 1rem;
+}
+
+/* ─── Game Section Styles ────────────────────────────────────────────────────────── */
+.game-section {
+  width: 100%;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.difficulty-display {
+  margin-top: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #402310;
+}
+
+.difficulty-display span {
+  font-weight: 800;
+}
+
+.category-display {
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #934204;
+}
+
+.game-box {
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.clues-container {
+  display: flex;
+  width: 75%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.clues-container p {
+  margin-bottom: 0.2rem;
+}
+
+.current-clue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #402310;
+}
+
+.previous-clues {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.75;
+  margin-bottom: 0.95rem;
+}
+
+.previous-clues .clue {
+  margin-bottom: 0.5rem;
+}
+
+.guess-form {
+  width: 100%;
+  text-align: center;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.input-wrapper input {
+  width: 90%;
+  border: 1px solid #000000;
+  padding: 16px 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.input-wrapper button {
+  background: linear-gradient(45deg, #FFA653, #A65A2A);
+  color: white;
+  margin-top: 1rem;
+  padding: 10px 20px;
+  font-size: 1.25rem;
+  width: 214px;
+  border-radius: 100px;
+}
+
+.clues-remaining {
+  margin-top: 1.25rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #934204;
+}
+
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 0.5px solid black;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
+  border-radius: 4px;
+  border: 0.5px solid black;
+  transition: width 0.5s ease;
+}
+
+/* ─── Top Ten Leaderboard Styles ────────────────────────────────────────────────────────── */
+.leaderboards-container {
+  margin-top: 4rem;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.leaderboard {
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.leaderboard h2 {
+  border: 1px solid #402310;
+  background-color: #FFF2CA;
+  width: 50%;
+  color: #402310;
+  height: 66px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  margin: 0;
+}
+
+.leaderboard-header {
+  font-weight: 600;
+  padding: 10px 0px 10px 0px;
+  border-bottom: 1px solid #402310;
+}
+
+.leaderboard-header,
+.leaderboard-entry {
+  display: flex;
+  align-items: center;
+  color: #402310;
+}
+
+/* rank column */
+.leaderboard-header .rank,
+.leaderboard-entry .rank {
+  flex: 0 0 90px;
+  text-align: center;
+}
+
+.leaderboard-entry .rank {
+  font-weight: 600;
+}
+
+/* name column */
+.leaderboard-header .name,
+.leaderboard-entry .name {
+  flex: 1 1 200px;
+}
+
+.leaderboard-entry .name a {
+  color: #402310;
+  text-decoration: underline;
+}
+
+.leaderboard-entry .name a:hover .x-logo {
+  transform: scale(1.15);
+}
+
+/* time column */
+.leaderboard-header .time,
+.leaderboard-entry .time {
+  flex: 0 0 80px;
+  text-align: left;
+}
+
+.leaderboard-entry .time {
+  font-family: monospace;
+}
+
+/* clues column */
+.leaderboard-header .clues,
+.leaderboard-entry .clues {
+  flex: 0 0 90px;
+  text-align: center;
+}
+
+/* streak column */
+.leaderboard-header .streak,
+.leaderboard-entry .streak {
+  flex: 0 0 90px;
+  text-align: center;
+}
+
+/* container widths */
+.leaderboard-header,
+.leaderboard-entries {
+  width: 50%;
+  border-left: 1px solid #707070;
+  border-right: 1px solid #707070;
+}
+
+.leaderboard-entry {
+  width: 100%;
+  border-bottom: 1px solid #707070;
+  background-color: #F1F1F1;
+  padding: 8px 0px 8px 0px;
+}
+
+.x-logo {
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  margin-left: 0.3em;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+}
+
+.streak-leaderboard {
+  margin-top: 1.5rem;
+}
+
+footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.countdown-container p {
+  font-size: 1.75rem;
+  color: #934204;
+}
+
+.countdown {
+  display: flex;
+  justify-content: center;
+  gap: 1.75rem;
+  font-family: 'Inter', serif;
+  color: #934204;
+}
+
+.countdown-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 60px;
+}
+
+.countdown-item span:first-child {
+  font-size: 3rem;
+  font-weight: 700;
+}
+
+.countdown-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.2rem;
+}
+
+/* ─── Modal Base Styles ────────────────────────────────────────────────────────── */
+/* Hide by default */
+.modal.hidden {
+  display: none;
+}
+
+/* Fullscreen overlay + centering */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;               /* enable centering */
+  align-items: center;         /* vertical center */
+  justify-content: center;     /* horizontal center */
+  z-index: 1000;
+}
+
+/* Semi-transparent backdrop */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* The white “dialog” box */
+.modal-content {
+  position: relative;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #402310;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  background-color: #40231044;
+}
+
+/* ─── Utility Classes ─────────────────────────────────────────────────────────── */
+/* If you need a quick “show” helper */
+.modal.show {
+  display: flex;
+}
+
+/* Centered text blocks, etc. */
+.text-center {
+  text-align: center;
+}
+
+/* Basic button reset */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font: inherit;
+}
+
+/* Inputs & form elements */
+input, button, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+/* Base styling for the stats modal section */
+#stats-modal .modal-content {
+  width: 90%;
+  max-width: 500px;     /* caps it on large screens */
+  padding: 1.5rem;      /* a bit tighter padding */
+  box-sizing: border-box;
+}
+
+.stats-section {
+  width: 100%;
+  max-width: 400px;     /* keeps it narrow on desktop */
+  margin: 0 auto;       /* center it */
+  padding: 1rem;        /* ensure some breathing room */
+  box-sizing: border-box;
+}
+
+.stats-section:hover {
+  transform: scale(1.02);
+}
+
+/* Each stats block styling */
+.stats-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #333;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Style for the dynamic value inside each block */
+.stats-block span {
+  font-weight: 700;
+  color: #e67e22;
+  transition: color 0.3s ease;
+}
+
+/* Auth Modal Styles */
+#auth-modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* dark semi-transparent overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+#auth-modal.hidden {
+  display: none !important;
+}
+
+/* The inner modal content box */
+#auth-modal .modal-content {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  animation: slideIn 0.5s ease-out;
+}
+
+/* Close icon styling */
+#auth-modal .modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+}
+
+/* Heading styling */
+#auth-modal h2 {
+  margin-bottom: 1rem;
+  color: #2c3e50;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
+/* Paragraph styling */
+#auth-modal p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #34495e;
+}
+
+/* List styling */
+#auth-modal ul {
+  list-style: disc;
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #7b4a1a;
+  width: 100%;
+}
+
+/* Modal buttons container */
+/* #auth-modal .modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
+} */
+
+/* Button styling */
+#auth-modal .btn {
+  background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#auth-modal .btn:hover {
+  box-shadow: 0 0 15px rgba(255, 186, 107, 0.8),
+              0 0 25px rgba(135, 94, 0, 0.6);
+}
+
+#auth-modal .play-game-btn {
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0;
+  color: #555;
+  text-decoration: underline;
+  background: none !important;
+  background-color: transparent !important;
+  border: none !important;
+  width: auto;
+}
+
+.auth-modal-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-modal-btns p {
+  width: 100%;
+  text-align: center;
+  margin: 0;
+}
+
+.auth-register-btn {
+  background: linear-gradient(45deg, #ad7748, #6d5229, #6f3f24);
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-register-btn:hover {
+  box-shadow: 0 0 15px rgba(146, 106, 61, 0.8),
+              0 0 25px rgba(51, 36, 0, 0.6);
+}
+
+.auth-modal-logo {
+  width: 150px;
+}
+
+/* ─── Login & Register Modal Styles ────────────────────────────────────────── */
+#login-modal .modal-content,
+#register-modal .modal-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 90%;
+  animation: modalFadeIn 0.3s ease-out;
+  position: relative;
+}
+
+/* close button already styled via .modal-close, just ensure it shows on these modals */
+#login-modal .modal-close,
+#register-modal .modal-close {
+  color: #402310;
+}
+
+/* headings */
+#login-modal h2,
+#register-modal h2 {
+  margin: 0 0 1rem;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  color: #402310;
+}
+
+/* form layout */
+#login-modal .auth-form,
+#register-modal .auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* labels & inputs */
+#login-modal label,
+#register-modal label {
+  font-weight: 600;
+  color: #402310;
+}
+#login-modal input,
+#register-modal input {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 90%;
+}
+
+/* submit buttons */
+#login-modal button[type="submit"],
+#register-modal button[type="submit"] {
+  background: linear-gradient(45deg, #FFA653, #A65A2A);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+#login-modal button[type="submit"]:hover,
+#register-modal button[type="submit"]:hover {
+  box-shadow: 0 0 15px rgba(255,186,107,0.8),
+              0 0 25px rgba(135,94,0,0.6);
+}
+
+/* “or Register” / “Login here” links under the form */
+#login-modal .auth-form p,
+#register-modal .auth-form p {
+  text-align: center;
+  margin: 0;
+}
+#login-modal .auth-form a,
+#register-modal .auth-form a {
+  color: #402310;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+#login-register-btn {
+  width: 100%;
+  text-align: center;
+}
+
+/* ─── Settings Modal Styles ─────────────────────────────────────────────────── */
+/* ─── Settings Modal (Updated) ───────────────────────────────────────────────── */
+#settings-modal .modal-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  width: 90%;
+  animation: modalFadeIn 0.3s ease-out;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Close button */
+#settings-modal .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #402310;
+  font-size: 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Section headings */
+#settings-modal h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #402310;
+  text-align: center;
+}
+
+/* Paragraph text */
+#settings-modal p {
+  margin: 0;
+  color: #402310;
+  font-size: 1rem;
+}
+
+/* Divider */
+#settings-modal hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 0.5rem 0;
+}
+
+/* Text inputs */
+#settings-modal input[type="text"] {
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Update X Profile button */
+#settings-modal #update-x-id {
+  background: linear-gradient(45deg, #FFA653, #A65A2A);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+#settings-modal #update-x-id:hover {
+  box-shadow: 0 0 15px rgba(255,186,107,0.8),
+              0 0 25px rgba(135,94,0,0.6);
+}
+
+/* Delete Account button */
+#settings-modal #delete-account-btn {
+  background: none;
+  color: #e74c3c;
+  border: 2px solid #e74c3c;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+#settings-modal #delete-account-btn:hover {
+  background: #e74c3c;
+  color: #ffffff;
+}
+
+/* ─── Game-Over Modal Styles ───────────────────────────────────────────────── */
+#game-over .modal-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 600px;
+  width: 90%;
+  animation: modalFadeIn 0.3s ease-out;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+/* close “x” */
+#game-over .modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #402310;
+  cursor: pointer;
+}
+
+/* container for result text + inputs */
+#game-over .result-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* header text */
+#game-over #result-header {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #402310;
+  text-align: center;
+}
+
+/* correct answer line */
+#game-over #correct-answer {
+  margin: 0;
+  font-size: 1rem;
+  color: #934204;
+  text-align: center;
+}
+
+/* summary box */
+#game-over #event-summary {
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Share button */
+#game-over #share-button {
+  background: linear-gradient(45deg, #FFA653, #A65A2A);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+#game-over #share-button:hover {
+  box-shadow: 0 0 15px rgba(255,186,107,0.8),
+              0 0 25px rgba(135,94,0,0.6);
+}
+
+/* “Read more Articles” link */
+#game-over .game-over-modal-article {
+  color: #402310;
+  text-decoration: underline;
+  font-size: 0.95rem;
+}
+
+/* all clues container */
+#game-over #all-clues-container {
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+/* name-entry section */
+#game-over .name-entry {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* text inputs in name-entry */
+#game-over .input-group input {
+  width: 80%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+/* Submit score button */
+#game-over #submit-score {
+  background: linear-gradient(45deg, #FFA653, #A65A2A);
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+#game-over #submit-score:hover {
+  box-shadow: 0 0 15px rgba(255,186,107,0.8),
+              0 0 25px rgba(135,94,0,0.6);
+}
+
+/* “return tomorrow” text */
+#game-over .return-tomorrow {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+  font-style: italic;
+  text-align: center;
+}
+
+/* ─── Always hide score submission ─────────────────────────────────────────── */
+#game-over .name-entry {
+  display: none !important;
+}
+
+.footer-text h2 {
+  color: #402310;
+}
+
+.footer-text p {
+  width: 50%;
+  color: #402310;
+}
+
+/* Keyframes */
+@keyframes wiggle {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(6deg); }
+  100% { transform: rotate(0deg); }
+} 
+
+@keyframes sway {
+  0% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(1deg);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+}
+
+@keyframes flash-update {
+  0% { background-color: var(--stats-bg, #f9f9f9); }
+  50% { background-color: #fff3c4; }
+  100% { background-color: var(--stats-bg, #f9f9f9); }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+  
+@keyframes newEntry {
+  from { background-color: var(--success-color); }
+  to { background-color: transparent; }
+}
+  
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  /* ─── Game & Input Adjustments ───────────────────────────────────────── */
+  .game-box {
+    max-width: 90%;
+  }
+  .clues-container,
+  .input-wrapper input {
+    width: 100%;
+  }
+  .input-wrapper button {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+  .difficulty-display,
+  .category-display {
+    font-size: 1rem;
+  }
+
+  /* ─── Leaderboard Full-Width ─────────────────────────────────────────── */
+  .leaderboard h2 {
+    width: 100%;
+    font-size: 1.25rem;
+    padding: 0.55rem 0;
+  }
+  .leaderboard-header,
+  .leaderboard-entries {
+    width: 100%;
+    border-left: none;
+    border-right: none;
+    padding: 0 0.5rem;
+  }
+  .leaderboard-entry {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .stats-section {
+    min-width: 300px;
+    padding: 0.75rem;   /* slightly less padding */
+  }
+  .stats-block {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  /* ─── Countdown & Footer tweaks ─────────────────────────────────────── */
+  .countdown-container p {
+    font-size: 1.25rem;
+  }
+  .countdown-item span:first-child {
+    font-size: 2rem;
+  }
+
+  /* ─── Navbar/Icon Scaling ───────────────────────────────────────────── */
+  .navbar {
+    padding: 0.5rem 1rem;
+  }
+  .navbar-left img {
+    width: 50px;
+    height: 50px;
+  }
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  #user-greeting {
+    display: hidden !important;
+  }
+
+  .input-wrapper input {
+    /* fill most of the viewport but leave a little breathing room */
+    width: calc(100% - 2rem);
+    max-width: 360px;      /* prevents it from getting absurdly wide on tablets */
+    margin: 0 auto;        /* center it */
+    box-sizing: border-box;
+  }
+
+  .leaderboards-container {
+    overflow-x: hidden;
+  }
+
+  /* Ensure header & rows use the same flex layout */
+  .leaderboard-header,
+  .leaderboard-entry {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;  /* slightly smaller text */
+    gap: 0.5rem;
+  }
+
+  /* Use percentage-based columns instead of px */
+  .leaderboard-header .rank,
+  .leaderboard-entry .rank {
+    flex: 0 0 15%;       /* 15% of the width for rank */
+    text-align: center;
+  }
+  .leaderboard-header .name,
+  .leaderboard-entry .name {
+    flex: 1 1 55%;       /* name takes the bulk of the space */
+    overflow: hidden;    /* prevent long names from pushing out */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .leaderboard-header .time,
+  .leaderboard-entry .time {
+    flex: 0 0 15%;       /* 15% for time */
+    text-align: left;
+  }
+  .leaderboard-header .clues,
+  .leaderboard-entry .clues {
+    flex: 0 0 15%;
+    text-align: center;
+  }
+  .leaderboard-header .streak,
+  .leaderboard-entry .streak {
+    flex: 0 0 15%;       /* 15% for clues/streak */
+    text-align: left;
+  }
+
+  /* Tweak padding so rows don’t overflow */
+  .leaderboard-header,
+  .leaderboard-entry {
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* ─── Widen the “About Historle” footer text ───────────────────────── */
+  .footer-text p {
+    width: 90% !important; /* override that inline 50% */
+    max-width: 600px;      /* cap on large phones/tablets */
+    margin: 0 auto;        /* keep it centered */
+    padding: 0 1rem;       /* a bit of horizontal padding */
+  }
+}
