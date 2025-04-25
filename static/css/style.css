@@ -1,5 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #34495e;
+  --accent-color: #8b4513;
+  --background-color: #f5f6e9;
+  --text-color: #2c3e50;
+  --border-color: #d4c5b9;
+  --success-color: #27ae60;
+  --error-color: #c0392b;
+  --game-width: 800px;
+  --leaderboard-width: 300px;
+  --light-bg: #f5f6e9;
+  --light-text: #2c3e50;
+}
+
 body {
   font-family: 'Inter';
   margin: 0;
@@ -1022,6 +1037,37 @@ input, button, select, textarea {
   width: 50%;
   color: #402310;
 }
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--success-color);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+}
+.toast.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.toast.error {
+  background-color: var(--error-color);
+}
+
+.auth-error {
+  font-size: 0.9rem;
+  color: var(--error-color);
+  margin-top: -0.5rem;
+} 
 
 /* Keyframes */
 @keyframes wiggle {
