@@ -142,7 +142,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(data => {
                 if (data.username) {
                     localStorage.setItem("username", data.username);
-                    document.getElementById("user-greeting").textContent = `Hello, ${formatUsername(data.username)}`;
+                    document.getElementById("user-greeting").textContent = `ello, ${formatUsername(data.username)}`;
     
                     // Clear existing navbar buttons
                     const navbarLinks = document.querySelector(".navbar-links");
