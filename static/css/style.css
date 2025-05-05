@@ -50,7 +50,6 @@ body {
   text-align: center;
 }
 
-/* When visible, slide down into view */
 .bookmark-banner.visible {
   transform: translate(-50%, 0);
 }
@@ -432,12 +431,10 @@ footer {
 }
 
 /* ─── Modal Base Styles ────────────────────────────────────────────────────────── */
-/* Hide by default */
 .modal.hidden {
   display: none;
 }
 
-/* Fullscreen overlay + centering */
 .modal {
   position: fixed;
   top: 0;
@@ -450,7 +447,6 @@ footer {
   z-index: 1000;
 }
 
-/* Semi-transparent backdrop */
 .modal-overlay {
   position: absolute;
   top: 0;
@@ -460,7 +456,6 @@ footer {
   background: rgba(0, 0, 0, 0.5);
 }
 
-/* The white “dialog” box */
 .modal-content {
   position: relative;
   background: #ffffff;
@@ -498,17 +493,14 @@ footer {
 }
 
 /* ─── Utility Classes ─────────────────────────────────────────────────────────── */
-/* If you need a quick “show” helper */
 .modal.show {
   display: flex;
 }
 
-/* Centered text blocks, etc. */
 .text-center {
   text-align: center;
 }
 
-/* Basic button reset */
 button {
   cursor: pointer;
   border: none;
@@ -516,7 +508,6 @@ button {
   font: inherit;
 }
 
-/* Inputs & form elements */
 input, button, select, textarea {
   font-family: inherit;
   font-size: 1rem;
@@ -526,16 +517,16 @@ input, button, select, textarea {
 /* Base styling for the stats modal section */
 #stats-modal .modal-content {
   width: 90%;
-  max-width: 500px;     /* caps it on large screens */
-  padding: 1.5rem;      /* a bit tighter padding */
+  max-width: 500px;
+  padding: 1.5rem;
   box-sizing: border-box;
 }
 
 .stats-section {
   width: 100%;
-  max-width: 400px;     /* keeps it narrow on desktop */
-  margin: 0 auto;       /* center it */
-  padding: 1rem;        /* ensure some breathing room */
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
   box-sizing: border-box;
 }
 
@@ -543,7 +534,6 @@ input, button, select, textarea {
   transform: scale(1.02);
 }
 
-/* Each stats block styling */
 .stats-block {
   display: flex;
   justify-content: space-between;
@@ -557,7 +547,6 @@ input, button, select, textarea {
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Style for the dynamic value inside each block */
 .stats-block span {
   font-weight: 700;
   color: #e67e22;
@@ -572,7 +561,7 @@ input, button, select, textarea {
   top: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7); /* dark semi-transparent overlay */
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -583,7 +572,6 @@ input, button, select, textarea {
   display: none !important;
 }
 
-/* The inner modal content box */
 #auth-modal .modal-content {
   background: #fff;
   padding: 2rem;
@@ -595,7 +583,6 @@ input, button, select, textarea {
   animation: slideIn 0.5s ease-out;
 }
 
-/* Close icon styling */
 #auth-modal .modal-close {
   position: absolute;
   top: 10px;
@@ -606,7 +593,6 @@ input, button, select, textarea {
   cursor: pointer;
 }
 
-/* Heading styling */
 #auth-modal h2 {
   margin-bottom: 1rem;
   color: #2c3e50;
@@ -618,14 +604,12 @@ input, button, select, textarea {
   justify-content: center;
 }
 
-/* Paragraph styling */
 #auth-modal p {
   font-size: 1.1rem;
   margin-bottom: 1rem;
   color: #34495e;
 }
 
-/* List styling */
 #auth-modal ul {
   list-style: disc;
   padding-left: 1.5rem;
@@ -634,14 +618,7 @@ input, button, select, textarea {
   width: 100%;
 }
 
-/* Modal buttons container */
-/* #auth-modal .modal-buttons {
-  display: flex;
-  justify-content: space-around;
-  gap: 1rem;
-} */
-
-/* Button styling */
+/* Button styling within auth modal */
 #auth-modal .btn {
   background: linear-gradient(45deg, #ffb06b, #cd9a4e, #d17845);
   color: #fff;
@@ -715,13 +692,11 @@ input, button, select, textarea {
   position: relative;
 }
 
-/* close button already styled via .modal-close, just ensure it shows on these modals */
 #login-modal .modal-close,
 #register-modal .modal-close {
   color: #402310;
 }
 
-/* headings */
 #login-modal h2,
 #register-modal h2 {
   margin: 0 0 1rem;
@@ -730,7 +705,6 @@ input, button, select, textarea {
   color: #402310;
 }
 
-/* form layout */
 #login-modal .auth-form,
 #register-modal .auth-form {
   display: flex;
@@ -738,7 +712,6 @@ input, button, select, textarea {
   gap: 1rem;
 }
 
-/* labels & inputs */
 #login-modal label,
 #register-modal label {
   font-weight: 600;
@@ -753,7 +726,6 @@ input, button, select, textarea {
   width: 90%;
 }
 
-/* submit buttons */
 #login-modal button[type="submit"],
 #register-modal button[type="submit"] {
   background: linear-gradient(45deg, #FFA653, #A65A2A);
@@ -771,7 +743,6 @@ input, button, select, textarea {
               0 0 25px rgba(135,94,0,0.6);
 }
 
-/* “or Register” / “Login here” links under the form */
 #login-modal .auth-form p,
 #register-modal .auth-form p {
   text-align: center;
@@ -790,7 +761,6 @@ input, button, select, textarea {
 }
 
 /* ─── Settings Modal Styles ─────────────────────────────────────────────────── */
-/* ─── Settings Modal (Updated) ───────────────────────────────────────────────── */
 #settings-modal .modal-content {
   background: #ffffff;
   padding: 2rem;
@@ -807,7 +777,6 @@ input, button, select, textarea {
   font-family: 'Inter', sans-serif;
 }
 
-/* Close button */
 #settings-modal .modal-close {
   position: absolute;
   top: 1rem;
@@ -819,7 +788,6 @@ input, button, select, textarea {
   cursor: pointer;
 }
 
-/* Section headings */
 #settings-modal h2 {
   margin: 0;
   font-size: 1.25rem;
@@ -827,21 +795,18 @@ input, button, select, textarea {
   text-align: center;
 }
 
-/* Paragraph text */
 #settings-modal p {
   margin: 0;
   color: #402310;
   font-size: 1rem;
 }
 
-/* Divider */
 #settings-modal hr {
   border: none;
   border-top: 1px solid #ddd;
   margin: 0.5rem 0;
 }
 
-/* Text inputs */
 #settings-modal input[type="text"] {
   padding: 0.75rem 1rem;
   border: 1px solid #ccc;
@@ -851,7 +816,6 @@ input, button, select, textarea {
   box-sizing: border-box;
 }
 
-/* Update X Profile button */
 #settings-modal #update-x-id {
   background: linear-gradient(45deg, #FFA653, #A65A2A);
   color: #fff;
@@ -867,7 +831,6 @@ input, button, select, textarea {
               0 0 25px rgba(135,94,0,0.6);
 }
 
-/* Delete Account button */
 #settings-modal #delete-account-btn {
   background: none;
   color: #e74c3c;
@@ -901,7 +864,6 @@ input, button, select, textarea {
   font-family: 'Inter', sans-serif;
 }
 
-/* close “x” */
 #game-over .modal-close {
   position: absolute;
   top: 1rem;
@@ -913,7 +875,6 @@ input, button, select, textarea {
   cursor: pointer;
 }
 
-/* container for result text + inputs */
 #game-over .result-container {
   width: 100%;
   display: flex;
@@ -922,7 +883,6 @@ input, button, select, textarea {
   gap: 1rem;
 }
 
-/* header text */
 #game-over #result-header {
   margin: 0;
   font-size: 1.5rem;
@@ -930,7 +890,6 @@ input, button, select, textarea {
   text-align: center;
 }
 
-/* correct answer line */
 #game-over #correct-answer {
   margin: 0;
   font-size: 1rem;
@@ -938,7 +897,6 @@ input, button, select, textarea {
   text-align: center;
 }
 
-/* summary box */
 #game-over #event-summary {
   width: 100%;
   max-height: 200px;
@@ -951,7 +909,6 @@ input, button, select, textarea {
   line-height: 1.4;
 }
 
-/* Share button */
 #game-over #share-button {
   background: linear-gradient(45deg, #FFA653, #A65A2A);
   color: #fff;
@@ -967,20 +924,17 @@ input, button, select, textarea {
               0 0 25px rgba(135,94,0,0.6);
 }
 
-/* “Read more Articles” link */
 #game-over .game-over-modal-article {
   color: #402310;
   text-decoration: underline;
   font-size: 0.95rem;
 }
 
-/* all clues container */
 #game-over #all-clues-container {
   width: 100%;
   margin-top: 0.5rem;
 }
 
-/* name-entry section */
 #game-over .name-entry {
   width: 100%;
   display: flex;
@@ -989,7 +943,6 @@ input, button, select, textarea {
   gap: 0.5rem;
 }
 
-/* text inputs in name-entry */
 #game-over .input-group input {
   width: 80%;
   padding: 0.75rem 1rem;
@@ -999,7 +952,6 @@ input, button, select, textarea {
   box-sizing: border-box;
 }
 
-/* Submit score button */
 #game-over #submit-score {
   background: linear-gradient(45deg, #FFA653, #A65A2A);
   color: #fff;
@@ -1015,7 +967,6 @@ input, button, select, textarea {
               0 0 25px rgba(135,94,0,0.6);
 }
 
-/* “return tomorrow” text */
 #game-over .return-tomorrow {
   margin-top: 1rem;
   font-size: 0.9rem;
@@ -1024,7 +975,6 @@ input, button, select, textarea {
   text-align: center;
 }
 
-/* ─── Always hide score submission ─────────────────────────────────────────── */
 #game-over .name-entry {
   display: none !important;
 }
@@ -1107,17 +1057,16 @@ input, button, select, textarea {
   }
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-  
+
 @keyframes newEntry {
   from { background-color: var(--success-color); }
   to { background-color: transparent; }
 }
-  
+
 @keyframes modalFadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
@@ -1167,7 +1116,7 @@ input, button, select, textarea {
 
   .stats-section {
     min-width: 300px;
-    padding: 0.75rem;   /* slightly less padding */
+    padding: 0.75rem;
   }
   .stats-block {
     padding: 0.5rem 0.75rem;
@@ -1200,10 +1149,9 @@ input, button, select, textarea {
   }
 
   .input-wrapper input {
-    /* fill most of the viewport but leave a little breathing room */
     width: calc(100% - 2rem);
-    max-width: 360px;      /* prevents it from getting absurdly wide on tablets */
-    margin: 0 auto;        /* center it */
+    max-width: 360px;
+    margin: 0 auto;
     box-sizing: border-box;
   }
 
@@ -1211,31 +1159,29 @@ input, button, select, textarea {
     overflow-x: hidden;
   }
 
-  /* Ensure header & rows use the same flex layout */
   .leaderboard-header,
   .leaderboard-entry {
     display: flex;
     align-items: center;
-    font-size: 0.9rem;  /* slightly smaller text */
+    font-size: 0.9rem;
     gap: 0.5rem;
   }
 
-  /* Use percentage-based columns instead of px */
   .leaderboard-header .rank,
   .leaderboard-entry .rank {
-    flex: 0 0 15%;       /* 15% of the width for rank */
+    flex: 0 0 15%;
     text-align: center;
   }
   .leaderboard-header .name,
   .leaderboard-entry .name {
-    flex: 1 1 55%;       /* name takes the bulk of the space */
-    overflow: hidden;    /* prevent long names from pushing out */
+    flex: 1 1 55%;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   .leaderboard-header .time,
   .leaderboard-entry .time {
-    flex: 0 0 15%;       /* 15% for time */
+    flex: 0 0 15%;
     text-align: left;
   }
   .leaderboard-header .clues,
@@ -1245,11 +1191,10 @@ input, button, select, textarea {
   }
   .leaderboard-header .streak,
   .leaderboard-entry .streak {
-    flex: 0 0 15%;       /* 15% for clues/streak */
+    flex: 0 0 15%;
     text-align: left;
   }
 
-  /* Tweak padding so rows don’t overflow */
   .leaderboard-header,
   .leaderboard-entry {
     padding: 0.5rem 0.75rem;
@@ -1257,9 +1202,29 @@ input, button, select, textarea {
 
   /* ─── Widen the “About Historle” footer text ───────────────────────── */
   .footer-text p {
-    width: 90% !important; /* override that inline 50% */
-    max-width: 600px;      /* cap on large phones/tablets */
-    margin: 0 auto;        /* keep it centered */
-    padding: 0 1rem;       /* a bit of horizontal padding */
+    width: 90% !important;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  /* ─── Disable all hover effects on touch devices ───────────────────── */
+  .navbar-link:hover .nav-icon,
+  .login-register-navbar-button:hover,
+  .leaderboard-entry .name a:hover .x-logo,
+  .stats-section:hover,
+  #auth-modal .btn:hover,
+  .auth-register-btn:hover,
+  #login-modal button[type="submit"]:hover,
+  #register-modal button[type="submit"]:hover,
+  #settings-modal #update-x-id:hover,
+  #settings-modal #delete-account-btn:hover,
+  #game-over #share-button:hover,
+  #game-over #submit-score:hover,
+  .modal-close:hover {
+    animation: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+    background-color: transparent !important;
   }
 }
