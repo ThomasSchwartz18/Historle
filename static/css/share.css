@@ -1,0 +1,57 @@
+/* share.css */
+/* Styles for the Game-Over modal share buttons (Facebook, Twitter, Instagram, Message) */
+
+.share-container {
+    display: flex;
+    gap: 0.75rem;
+    margin: 0rem 0rem 1rem 0rem;
+  }
+  
+  .share-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #fff;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+  
+  /* Facebook Blue */
+  .share-btn.facebook {
+    background: #3b5998;
+  }
+  
+  /* Twitter Cyan */
+  .share-btn.twitter {
+    background: #1da1f2;
+  }
+  
+  /* Instagram Gradient */
+  .share-btn.instagram {
+    background: radial-gradient(circle at 30% 107%,
+                #fdf497 0%, #fdf497 5%, #fd5949 45%,
+                #d6249f 60%, #285aeb 90%);
+  }
+  
+  /* Message Green */
+  .share-btn.message {
+    background: #4CAF50;
+  }
+  
+  .share-btn:hover {
+    opacity: 0.9;
+  }
+  
+  /* Stack vertically on touch devices or small screens */
+  @media (pointer: coarse), (max-width: 768px) {
+    .share-container {
+      flex-direction: column;
+    }
+  }
+  

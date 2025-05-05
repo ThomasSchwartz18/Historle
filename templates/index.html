@@ -6,6 +6,7 @@
   <title>Historle - Guess the moment. One clue at a time.</title>
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo1.png') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/share.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/logo1.png') }}">
@@ -41,6 +42,13 @@
     src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
     data-ad-client="ca-pub-8830819691283646">
   </script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-…"
+    crossorigin="anonymous"
+  />
 </head>
 <body>
   <!-- CONFETTI CANVAS: sits on top of everything -->
@@ -238,7 +246,23 @@
         <h2 id="result-header"></h2>
         <p id="correct-answer"></p>
         <div class="summary" id="event-summary"></div>
-        <button id="share-button" class="share-button">Share Result</button>
+
+        <h2>Easily share your results!</h2>
+        <div class="share-container">
+          <button id="share-facebook" class="share-btn facebook">
+            <i class="fab fa-facebook-f"></i> Facebook
+          </button>
+          <button id="share-twitter" class="share-btn twitter">
+            <i class="fab fa-twitter"></i> Twitter
+          </button>
+          <button id="share-instagram" class="share-btn instagram">
+            <i class="fab fa-instagram"></i> Instagram
+          </button>
+          <button id="share-message" class="share-btn message">
+            <i class="fas fa-comment-alt"></i> Message
+          </button>
+        </div>
+        
         <a href="/articles" class="game-over-modal-article" title="Articles">Read more Articles!</a>
         <!-- add this right below the summary -->
         <div id="all-clues-container" class="all-clues-container"></div>
@@ -368,7 +392,8 @@
   <!-- Confetti library -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-  <script src="{{ url_for('static', filename='game.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/game.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/share.js') }}"></script>
   <div id="toast" class="toast hidden"></div>
 </body>
 </html>

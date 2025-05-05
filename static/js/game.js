@@ -2,6 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // **Global Game State Variables**
     let currentEvent = null;
     let currentClueIndex = 0;
+    window.currentClueIndex = currentClueIndex;
     let remainingGuesses = 5;
     // Do not assign the answer details from the event payload
     let correctAnswer = "";
@@ -24,12 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const nameInput = document.getElementById("player-name");
     const submitScoreBtn = document.getElementById("submit-score");
     const leaderboardEl = document.getElementById("leaderboard-entries");
-    const shareButton = document.getElementById("share-button");
+    // const shareButton = document.getElementById("share-button");
     const progressBarEl = document.getElementById("progress-bar");
 
     // Symbols for the share result grid
-    const BROWN_SQUARE = "🟫";
-    const GREY_SQUARE = "⬜";
+    // const BROWN_SQUARE = "🟫";
+    // const GREY_SQUARE = "⬜";
 
     // Define formatUsername in the global scope of DOMContentLoaded
     function formatUsername(username) {
@@ -534,6 +535,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 currentClueIndex++;
                 remainingGuesses--;
+                window.currentClueIndex = currentClueIndex;
                 updateProgressBar();
                 if (remainingGuesses <= 0 || currentClueIndex >= currentEvent.clues.length) {
                     finishGame(false);
@@ -768,34 +770,34 @@ document.addEventListener("DOMContentLoaded", () => {
     }    
 
     // Share the game result.
-    function handleShare() {
-        if (!currentEvent) return;
-        const totalGuesses = 5;
-        const cluesUsed = currentClueIndex;
-        const brownCount = totalGuesses - cluesUsed;
-        const greyCount = cluesUsed;
-        const guessLine = BROWN_SQUARE.repeat(brownCount) + GREY_SQUARE.repeat(greyCount);
-        const shareMessage = `My Historle guesses:\n${guessLine}\nGive it a try: www.historle.com`;
-        if (navigator.share) {
-            navigator.share({
-                title: "Historle Result",
-                text: shareMessage,
-                url: "https://www.historle.com"
-            }).catch(err => console.error("Error sharing:", err));
-        } else if (navigator.clipboard) {
-            navigator.clipboard.writeText(shareMessage)
-                .then(() => alert("Result copied to clipboard!"))
-                .catch(err => console.error("Failed to copy result.", err));
-        } else {
-            alert(shareMessage);
-        }
-    }
+    // function handleShare() {
+    //     if (!currentEvent) return;
+    //     const totalGuesses = 5;
+    //     const cluesUsed = currentClueIndex;
+    //     const brownCount = totalGuesses - cluesUsed;
+    //     const greyCount = cluesUsed;
+    //     const guessLine = BROWN_SQUARE.repeat(brownCount) + GREY_SQUARE.repeat(greyCount);
+    //     const shareMessage = `My Historle guesses:\n${guessLine}\nGive it a try: www.historle.com`;
+    //     if (navigator.share) {
+    //         navigator.share({
+    //             title: "Historle Result",
+    //             text: shareMessage,
+    //             url: "https://www.historle.com"
+    //         }).catch(err => console.error("Error sharing:", err));
+    //     } else if (navigator.clipboard) {
+    //         navigator.clipboard.writeText(shareMessage)
+    //             .then(() => alert("Result copied to clipboard!"))
+    //             .catch(err => console.error("Failed to copy result.", err));
+    //     } else {
+    //         alert(shareMessage);
+    //     }
+    // }
 
     // Event listeners for UI interactions.
     modalCloseBtn.addEventListener("click", () => {
         gameOverModal.classList.add("hidden");
     });
-    shareButton.addEventListener("click", handleShare);
+    // shareButton.addEventListener("click", handleShare);
     guessForm.addEventListener("submit", handleGuess);
 
     // Settings button: when clicked, open the settings modal and prepopulate the x_id input.
